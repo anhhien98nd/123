@@ -1,0 +1,48 @@
+-- Auto Shield (standalone)
+-- Hành vi: sau 3s bật shield (true), sau 3s tắt shield (false). Không cần code gốc.
+
+local START_DELAY = 3   -- chờ trước khi bật (giây)
+local ACTIVE_TIME  = 3  -- thời gian giữ bật (giây)
+
+-- cố gắng tìm remote giống code gốc: ReplicatedStorage.BridgeNet2.dataRemoteEvent
+local remote
+pcall(function()
+    local rs = game:GetService("ReplicatedStorage")
+    local bridge = rs:FindFirstChild("BridgeNet2")
+    if bridge then
+        remote = bridge:FindFirstChild("dataRemoteEvent")
+    end
+    -- fallback: tìm descendant có tên "dataRemoteEvent"
+    if not remote then
+        for _, v in ipairs(rs:GetDescendants()) do
+            if v.Name == "dataRemoteEvent" then
+                remote = v
+                break
+            end
+        end
+    end
+end)
+
+local function safeFireShield(state)
+    if remote then
+        pcall(function()
+            remote:FireServer({ state, "\024" })
+        end)
+    else
+        if not safeFireShield._warned then
+            safeFireShield._warned = true
+            warn("[Auto Shield] Không tìm thấy dataRemoteEvent; không gửi được yêu cầu.")
+        end
+    end
+end
+
+-- main
+task.spawn(function()
+    task.wait(START_DELAY)
+    print("[Auto Shield] BẬT")
+    safeFireShield(true)
+
+    task.wait(ACTIVE_TIME)
+    safeFireShield(false)
+    print("[Auto Shield] TẮT")
+end)
