@@ -33,6 +33,6 @@ task.spawn(function()
 	end
 
 	-- Giữ trong 1 giây rồi “tắt”
-	task.wait(3)
+	task.wait(1)
 	print("[AUTO] Dừng teleport sau 1 giây")
 end)
