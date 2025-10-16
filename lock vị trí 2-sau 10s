@@ -11,7 +11,7 @@ local STATE = { tp2 = false }
 
 task.spawn(function()
 	-- Chờ 10 giây trước khi bật
-	task.wait(7)
+	task.wait(10)
 	print("[AUTO] Bật TP2 Lock sau 10 giây")
 
 	STATE.tp2 = true
