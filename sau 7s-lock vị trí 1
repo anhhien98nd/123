@@ -1,13 +1,13 @@
--- Auto TP1 Lock: bật sau 7s, tắt sau 3s (standalone)
+-- Auto TP1 Lock: bật sau 10s, tắt sau 3s (standalone)
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
 local STATE = { tp1 = false }
 
 task.spawn(function()
-	-- chờ 7 giây rồi bật
-	task.wait(7)
-	print("[AUTO] Bật TP1 Lock sau 7 giây")
+	-- chờ 10 giây rồi bật
+	task.wait(10)
+	print("[AUTO] Bật TP1 Lock sau 10 giây")
 	STATE.tp1 = true
 
 	-- vị trí TP1 (giữ nguyên từ code gốc)
