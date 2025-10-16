@@ -23,7 +23,7 @@ task.spawn(function()
 	task.wait(3)
 	print("[AUTO] Dịch chuyển tới Cổng 2 sau 3 giây")
 
-	-- Vị trí cổng 1
+	-- Vị trí cổng 2
 	local v = Vector3.new(18.37334884643555, 0.37274569272994995, -140.72775268554688)
 
 	local chr = p.Character or p.CharacterAdded:Wait()
@@ -32,7 +32,7 @@ task.spawn(function()
 		hrp.CFrame = CFrame.new(v + Vector3.new(0,5,0))
 	end
 
-	-- Giữ trong 3 giây rồi “tắt”
+	-- Giữ trong 1 giây rồi “tắt”
 	task.wait(3)
-	print("[AUTO] Dừng teleport sau 3 giây")
+	print("[AUTO] Dừng teleport sau 1 giây")
 end)
