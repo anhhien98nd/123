@@ -3,7 +3,7 @@
 (Phần GUI, nút, mkBtn... đã bị vô hiệu hoá)
 ]]
 
--- ✅ PHẦN THỰC TẾ: AUTO BẬT TP2 LOCK SAU 7 GIÂY
+-- ✅ PHẦN THỰC TẾ: AUTO BẬT TP1 LOCK SAU 7 GIÂY
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
