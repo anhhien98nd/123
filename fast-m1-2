@@ -2,8 +2,8 @@
 -- Bật sau 10s, chạy 10s, rồi tắt. Không tạo GUI, không phụ thuộc code gốc.
 
 -- cấu hình
-local START_DELAY = 10    -- chờ trước khi bật (giây)
-local ACTIVE_TIME = 10    -- giữ bật (giây)
+local START_DELAY = 13    -- chờ trước khi bật (giây)
+local ACTIVE_TIME = 13    -- giữ bật (giây)
 local FIRE_INTERVAL = 0.1 -- khoảng cách giữa mỗi lần gửi (giây)
 
 -- tìm remote giống code gốc: ReplicatedStorage.BridgeNet2.dataRemoteEvent
