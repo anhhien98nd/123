@@ -3,16 +3,16 @@
 (Phần GUI, nút, mkBtn... đã bị vô hiệu hoá)
 ]]
 
--- ✅ PHẦN THỰC TẾ: AUTO BẬT TP2 LOCK SAU 7 GIÂY, TẮT SAU 3 GIÂY
+-- ✅ PHẦN THỰC TẾ: AUTO BẬT TP2 LOCK SAU 10 GIÂY, TẮT SAU 3 GIÂY
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
 local STATE = { tp2 = false }
 
 task.spawn(function()
-	-- Chờ 7 giây trước khi bật
+	-- Chờ 10 giây trước khi bật
 	task.wait(7)
-	print("[AUTO] Bật TP2 Lock sau 7 giây")
+	print("[AUTO] Bật TP2 Lock sau 10 giây")
 
 	STATE.tp2 = true
 	local pos = Vector3.new(42.29, 3.63, -132.49)
