@@ -1,0 +1,40 @@
+--[[ 
+🚫 KHÔNG CHẠY CODE GỐC
+(Phần GUI, nút, mkBtn... đã bị vô hiệu hoá)
+]]
+
+-- ✅ PHẦN THỰC TẾ: AUTO BẬT TP2 LOCK SAU 7 GIÂY
+local Players = game:GetService("Players")
+local p = Players.LocalPlayer
+
+local STATE = {tp2 = false}
+
+task.spawn(function()
+	task.wait(7)
+	print("[AUTO] Bật TP2 Lock sau 7 giây")
+
+	STATE.tp2 = true
+	local pos = Vector3.new(42.29, 3.63, -132.49)
+	local look
+	pcall(function()
+		look = p.Character 
+			and p.Character:FindFirstChild("HumanoidRootPart") 
+			and p.Character.HumanoidRootPart.CFrame.LookVector
+	end)
+
+	task.spawn(function()
+		while STATE.tp2 do
+			task.wait()
+			local c = p.Character
+			if c and c:FindFirstChild("HumanoidRootPart") then
+				local h = c.HumanoidRootPart
+				h.Velocity = Vector3.new()
+				if look then
+					h.CFrame = CFrame.new(pos, pos + look)
+				else
+					h.CFrame = CFrame.new(pos)
+				end
+			end
+		end
+	end)
+end)
