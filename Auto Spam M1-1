@@ -1,0 +1,70 @@
+-- Auto Spam M1 (standalone)
+-- Bật sau 3s, chạy 3s, rồi tắt. Không cần code gốc / GUI.
+
+local START_DELAY = 3    -- chờ trước khi bật (giây)
+local ACTIVE_TIME  = 3   -- giữ bật (giây)
+local FIRE_INTERVAL = 0.4 -- khoảng giữa mỗi lần gửi (giây)
+
+-- cố gắng tìm remote giống code gốc: ReplicatedStorage.BridgeNet2.dataRemoteEvent
+local remote
+pcall(function()
+    local rs = game:GetService("ReplicatedStorage")
+    local bridge = rs:FindFirstChild("BridgeNet2")
+    if bridge then
+        remote = bridge:FindFirstChild("dataRemoteEvent")
+    end
+    -- fallback: tìm trong toàn bộ ReplicatedStorage nếu chưa tìm thấy
+    if not remote then
+        for _, v in ipairs(rs:GetDescendants()) do
+            if v.Name == "dataRemoteEvent" then
+                remote = v
+                break
+            end
+        end
+    end
+end)
+
+-- thiết lập bf: dùng buffer.fromstring nếu có, ngược lại trả nguyên chuỗi
+local bf
+if type(buffer) == "table" and type(buffer.fromstring) == "function" then
+    bf = buffer.fromstring
+else
+    bf = function(s) return s end
+end
+
+local payload_str = "\019\000\000\0000201000113686372022\000"
+
+local function safeFire()
+    if remote and bf then
+        pcall(function()
+            remote:FireServer({ { bf(payload_str) }, "\019" })
+        end)
+    else
+        if not safeFire._warned then
+            safeFire._warned = true
+            warn("[Auto Spam M1] remote hoặc bf không khả dụng; không gửi được.")
+        end
+    end
+end
+
+-- main
+task.spawn(function()
+    task.wait(START_DELAY)
+    print("[Auto Spam M1] ON")
+    local t0 = tick()
+    local running = true
+
+    task.spawn(function()
+        while running and tick() - t0 < ACTIVE_TIME do
+            safeFire()
+            task.wait(FIRE_INTERVAL)
+        end
+    end)
+
+    -- đợi hết thời gian hoạt động
+    while tick() - t0 < ACTIVE_TIME do
+        task.wait(0.1)
+    end
+    running = false
+    print("[Auto Spam M1] OFF")
+end)
