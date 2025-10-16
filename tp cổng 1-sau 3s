@@ -32,7 +32,7 @@ task.spawn(function()
 		hrp.CFrame = CFrame.new(v + Vector3.new(0,5,0))
 	end
 
-	-- Giữ trong 3 giây rồi “tắt”
-	task.wait(3)
-	print("[AUTO] Dừng teleport sau 3 giây")
+	-- Giữ trong 1 giây rồi “tắt”
+	task.wait(1)
+	print("[AUTO] Dừng teleport sau 1 giây")
 end)
