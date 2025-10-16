@@ -1,0 +1,73 @@
+-- Auto Fast M1 (standalone, không cần code gốc)
+-- Bật sau 10s, chạy 10s, rồi tắt. Không tạo GUI, không phụ thuộc code gốc.
+
+-- cấu hình
+local START_DELAY = 10    -- chờ trước khi bật (giây)
+local ACTIVE_TIME = 10    -- giữ bật (giây)
+local FIRE_INTERVAL = 0.1 -- khoảng cách giữa mỗi lần gửi (giây)
+
+-- tìm remote giống code gốc: ReplicatedStorage.BridgeNet2.dataRemoteEvent
+local remote
+pcall(function()
+    local rs = game:GetService("ReplicatedStorage")
+    local bridge = rs:FindFirstChild("BridgeNet2")
+    if bridge then
+        remote = bridge:FindFirstChild("dataRemoteEvent")
+    end
+    -- fallback: tìm bất kỳ RemoteEvent/RemoteFunction có tên "dataRemoteEvent" trong ReplicatedStorage
+    if not remote then
+        local found = rs:FindFirstChild("dataRemoteEvent", true) -- true để tìm sâu (roblox lua may not support second param; if not, we leave it nil)
+        if found then remote = found end
+    end
+end)
+
+-- thiết lập bf: nếu exploit cung cấp `buffer.fromstring` thì dùng, không thì fallback trả nguyên chuỗi
+local bf
+if type(buffer) == "table" and type(buffer.fromstring) == "function" then
+    bf = buffer.fromstring
+else
+    -- fallback: trả lại chuỗi thô (nếu server chấp nhận chuỗi thay vì buffer)
+    bf = function(s) return s end
+end
+
+-- payload gốc (giữ nguyên)
+local payload_str = "\019\000\000\0000201000113686372022\000"
+
+-- hàm gửi an toàn
+local function safeFire()
+    if remote and bf then
+        pcall(function()
+            -- gốc gửi: remote:FireServer({{bf("<...>")},"\019"})
+            remote:FireServer({{ bf(payload_str) }, "\019"})
+        end)
+    else
+        -- nếu không tìm thấy remote, log cảnh báo 1 lần
+        if not safeFire._warned then
+            safeFire._warned = true
+            warn("[Auto Fast M1] remote hoặc bf không khả dụng; không thể gửi yêu cầu.")
+        end
+    end
+end
+
+-- main: bật sau START_DELAY, chạy trong ACTIVE_TIME, tắt
+task.spawn(function()
+    task.wait(START_DELAY)
+    print("[Auto Fast M1] ON")
+    local t0 = tick()
+    local running = true
+
+    -- vòng spam gửi
+    local spamThread = task.spawn(function()
+        while running and tick() - t0 < ACTIVE_TIME do
+            safeFire()
+            task.wait(FIRE_INTERVAL)
+        end
+    end)
+
+    -- chờ hết thời gian hoạt động rồi dừng
+    while tick() - t0 < ACTIVE_TIME do
+        task.wait(0.1)
+    end
+    running = false
+    print("[Auto Fast M1] OFF")
+end)
