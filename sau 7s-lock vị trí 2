@@ -3,26 +3,30 @@
 (Phần GUI, nút, mkBtn... đã bị vô hiệu hoá)
 ]]
 
--- ✅ PHẦN THỰC TẾ: AUTO BẬT TP2 LOCK SAU 7 GIÂY
+-- ✅ PHẦN THỰC TẾ: AUTO BẬT TP2 LOCK SAU 7 GIÂY, TẮT SAU 3 GIÂY
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
-local STATE = {tp2 = false}
+local STATE = { tp2 = false }
 
 task.spawn(function()
+	-- Chờ 7 giây trước khi bật
 	task.wait(7)
 	print("[AUTO] Bật TP2 Lock sau 7 giây")
 
 	STATE.tp2 = true
 	local pos = Vector3.new(42.29, 3.63, -132.49)
+
+	-- Lưu hướng nhìn hiện tại nếu có
 	local look
 	pcall(function()
-		look = p.Character 
-			and p.Character:FindFirstChild("HumanoidRootPart") 
+		look = p.Character
+			and p.Character:FindFirstChild("HumanoidRootPart")
 			and p.Character.HumanoidRootPart.CFrame.LookVector
 	end)
 
-	task.spawn(function()
+	-- Bắt đầu vòng lặp giữ vị trí TP2 Lock
+	local lockThread = task.spawn(function()
 		while STATE.tp2 do
 			task.wait()
 			local c = p.Character
@@ -37,4 +41,10 @@ task.spawn(function()
 			end
 		end
 	end)
+
+	-- Sau 3 giây tự động tắt TP2 Lock
+	task.wait(3)
+	STATE.tp2 = false
+	print("[AUTO] Tắt TP2 Lock sau 3 giây")
+	-- vòng lặp lock tự dừng khi STATE.tp2 = false
 end)
