@@ -1,15 +1,15 @@
 -- Auto Spam M1 (multi schedule, standalone)
--- Mỗi entry trong schedule: {start_time, duration}
+-- Mỗi entry trong schedule: {start_time, end_time}
 -- => start_time: thời điểm bắt đầu (tính từ lúc script bắt đầu)
--- => duration: thời gian hoạt động (giây)
+-- => end_time: thời điểm kết thúc (giây)
 
 local FIRE_INTERVAL = 0.4 -- khoảng giữa mỗi lần gửi (giây)
 
 -- Các lần Spam M1
 local schedule = {
-    {62, 65},  -- bắt đầu 62s, chạy 65s  → kết thúc 127s
-    {74, 77},  -- bắt đầu 74s, chạy 77s  → kết thúc 151s
-    {86, 89},  -- bắt đầu 86s, chạy 89s  → kết thúc 175s
+    {62, 65},  -- bật lúc 62s, tắt lúc 65s
+    {74, 77},  -- bật lúc 74s, tắt lúc 77s
+    {86, 89},  -- bật lúc 86s, tắt lúc 89s
 }
 
 -- Tìm remote: ReplicatedStorage → BridgeNet2 → dataRemoteEvent
@@ -53,29 +53,28 @@ local function safeFire()
     end
 end
 
--- Chạy từng schedule
+-- MAIN LOOP (xử lý từng schedule)
 local tick0 = tick()
 
 for i, window in ipairs(schedule) do
-    local start_time, duration = window[1], window[2]
-    if type(start_time) == "number" and type(duration) == "number" and duration > 0 then
+    local start_time, end_time = window[1], window[2]
+    if type(start_time) == "number" and type(end_time) == "number" and end_time > start_time then
         task.spawn(function()
             -- đợi tới thời điểm bắt đầu
             local wait_time = tick0 + start_time - tick()
             if wait_time > 0 then task.wait(wait_time) end
 
-            local end_time = tick0 + start_time + duration
-            print(("[Auto Spam M1] #%d ON (%.1fs -> %.1fs)"):format(i, start_time, start_time + duration))
+            print(("[Auto Spam M1] #%d BẬT (%.1fs → %.1fs)"):format(i, start_time, end_time))
 
             -- spam trong khoảng thời gian hoạt động
-            while tick() < end_time do
+            while tick() < tick0 + end_time do
                 safeFire()
                 task.wait(FIRE_INTERVAL)
             end
 
-            print(("[Auto Spam M1] #%d OFF (kết thúc %.1fs)"):format(i, start_time + duration))
+            print(("[Auto Spam M1] #%d TẮT (%.1fs)"):format(i, end_time))
         end)
     else
-        warn(("[Auto Spam M1] Schedule #%d không hợp lệ (start=%s, duration=%s)"):format(i, tostring(start_time), tostring(duration)))
+        warn(("[Auto Spam M1] Schedule #%d không hợp lệ (start=%s, end=%s)"):format(i, tostring(start_time), tostring(end_time)))
     end
 end
