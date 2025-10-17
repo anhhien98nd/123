@@ -1,12 +1,12 @@
 -- Auto Shield (multi schedule, standalone)
--- Mỗi entry trong schedule = {start_time, duration}
--- start_time: thời điểm bắt đầu (tính bằng giây kể từ khi script chạy)
--- duration: thời gian giữ bật shield (giây)
+-- Mỗi entry trong schedule = {start_time, end_time}
+-- start_time: thời điểm bắt đầu (giây kể từ khi script chạy)
+-- end_time: thời điểm kết thúc (giây kể từ khi script chạy)
 
 local schedule = {
-    {62, 66},  -- bật sau 62s, giữ 66s → tắt lúc 128s
-    {74, 78},  -- bật sau 74s, giữ 78s → tắt lúc 152s
-    {86, 90},  -- bật sau 86s, giữ 90s → tắt lúc 176s
+    {62, 66},  -- bật lúc 62s, tắt lúc 66s
+    {74, 78},  -- bật lúc 74s, tắt lúc 78s
+    {86, 90},  -- bật lúc 86s, tắt lúc 90s
 }
 
 -- Tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent
@@ -44,25 +44,24 @@ end
 local tick0 = tick()
 
 for i, window in ipairs(schedule) do
-    local start_time, duration = window[1], window[2]
-    if type(start_time) == "number" and type(duration) == "number" and duration > 0 then
+    local start_time, end_time = window[1], window[2]
+    if type(start_time) == "number" and type(end_time) == "number" and end_time > start_time then
         task.spawn(function()
-            -- Chờ đến thời điểm bắt đầu
+            -- chờ đến lúc bật
             local wait_time = tick0 + start_time - tick()
             if wait_time > 0 then task.wait(wait_time) end
 
-            local end_time = tick0 + start_time + duration
-            print(("[Auto Shield] #%d BẬT (%.1fs → %.1fs)"):format(i, start_time, start_time + duration))
+            print(("[Auto Shield] #%d BẬT (%.1fs → %.1fs)"):format(i, start_time, end_time))
             safeFireShield(true)
 
-            -- Giữ trong khoảng thời gian hoạt động
-            local remain = end_time - tick()
+            -- chờ tới lúc tắt
+            local remain = tick0 + end_time - tick()
             if remain > 0 then task.wait(remain) end
 
             safeFireShield(false)
-            print(("[Auto Shield] #%d TẮT (kết thúc %.1fs)"):format(i, start_time + duration))
+            print(("[Auto Shield] #%d TẮT (%.1fs)"):format(i, end_time))
         end)
     else
-        warn(("[Auto Shield] Schedule #%d không hợp lệ (start=%s, duration=%s)"):format(i, tostring(start_time), tostring(duration)))
+        warn(("[Auto Shield] Schedule #%d không hợp lệ (start=%s, end=%s)"):format(i, tostring(start_time), tostring(end_time)))
     end
 end
