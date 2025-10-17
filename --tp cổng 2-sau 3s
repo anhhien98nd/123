@@ -18,7 +18,7 @@ end)
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
--- 🕒 AUTO TELE "Cổng 2" SAU 3 GIÂY RỒI TẮT SAU 3 GIÂY
+-- 🕒 AUTO TELE "Cổng 2" SAU 3 GIÂY RỒI TẮT SAU 1 GIÂY
 task.spawn(function()
 	task.wait(3)
 	print("[AUTO] Dịch chuyển tới Cổng 2 sau 3 giây")
