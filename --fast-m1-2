@@ -1,13 +1,13 @@
 -- Auto Fast M1 (multi-schedule, standalone)
--- Mỗi entry trong `schedule` = {start_seconds, duration_seconds} (tính từ lúc script bắt đầu)
--- Ví dụ: {13,54} nghĩa là bắt đầu ở 13s, chạy 54s (kết thúc ở 67s)
+-- Mỗi entry trong schedule = {start_seconds, end_seconds} (tính từ lúc script bắt đầu)
+-- Ví dụ: {13, 54} => bật từ 13s đến 54s (chạy 41 giây)
 
 local FIRE_INTERVAL = 0.1 -- khoảng cách giữa mỗi lần gửi (giây)
 
--- đặt lịch: thêm {13,54} (bản cũ) và {92,96} (bạn yêu cầu)
+-- lịch hoạt động (thời điểm bắt đầu và tắt)
 local schedule = {
-    {13, 54},  -- start 13s, duration 54s  -> end = 67s
-    {92, 96},  -- start 92s, duration 96s  -> end = 188s
+    {13, 54},  -- bật lúc 13s, tắt lúc 54s  (chạy 41s)
+    {92, 96},  -- bật lúc 92s, tắt lúc 96s  (chạy 4s)
 }
 
 -- tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback tìm descendants)
@@ -55,33 +55,33 @@ end
 local tick0 = tick()
 
 for i, win in ipairs(schedule) do
-    local startSec, duration = win[1], win[2]
-    if type(startSec) ~= "number" or type(duration) ~= "number" or duration <= 0 then
-        warn(("[Auto Fast M1] Schedule #%d không hợp lệ (start=%s, duration=%s) — bỏ qua"):format(i, tostring(startSec), tostring(duration)))
+    local startSec, endSec = win[1], win[2]
+    local duration = endSec - startSec
+
+    if type(startSec) ~= "number" or type(endSec) ~= "number" or duration <= 0 then
+        warn(("[Auto Fast M1] Schedule #%d không hợp lệ (start=%s, end=%s) — bỏ qua"):format(i, tostring(startSec), tostring(endSec)))
     else
         task.spawn(function()
             local startTime = tick0 + startSec
-            local endTime = startTime + duration
+            local endTime = tick0 + endSec
 
-            -- chờ đến thời điểm bắt đầu
+            -- chờ tới lúc bắt đầu
             local toWait = startTime - tick()
             if toWait > 0 then task.wait(toWait) end
 
-            -- nếu đã vượt quá endTime, bỏ qua
             if tick() >= endTime then
-                warn(("[Auto Fast M1] Schedule #%d đã trôi qua trước khi bắt đầu — bỏ qua"):format(i))
+                warn(("[Auto Fast M1] Schedule #%d đã trôi qua — bỏ qua"):format(i))
                 return
             end
 
-            print(("[Auto Fast M1] Schedule #%d ON (%.1fs -> %.1fs)"):format(i, startSec, startSec + duration))
+            print(("[Auto Fast M1] #%d ON (%.1fs -> %.1fs)"):format(i, startSec, endSec))
 
-            -- spam trong cửa sổ thời gian
             while tick() < endTime do
                 safeFire()
                 task.wait(FIRE_INTERVAL)
             end
 
-            print(("[Auto Fast M1] Schedule #%d OFF (kết thúc %.1fs)"):format(i, startSec + duration))
+            print(("[Auto Fast M1] #%d OFF (%.1fs)"):format(i, endSec))
         end)
     end
 end
