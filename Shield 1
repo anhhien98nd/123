@@ -4,9 +4,9 @@
 -- end_time: thời điểm kết thúc (giây kể từ khi script chạy)
 
 local schedule = {
-    {62, 66},  -- bật lúc 62s, tắt lúc 66s
-    {80, 84},  -- bật lúc 80s, tắt lúc 84s
-    {94, 98},  -- bật lúc 94s, tắt lúc 98s
+    {71, 79},  -- bật lúc 62s, tắt lúc 66s
+    {94, 102},  -- bật lúc 80s, tắt lúc 84s
+    {115, 124},  -- bật lúc 94s, tắt lúc 98s
 }
 
 -- Tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent
