@@ -1,8 +1,8 @@
 -- Auto Spam M1 (standalone)
--- Bật sau 3s, chạy 3s, rồi tắt. Không cần code gốc / GUI.
+-- Bật sau 62s, chạy 65s, rồi tắt. Không cần code gốc / GUI.
 
-local START_DELAY = 3    -- chờ trước khi bật (giây)
-local ACTIVE_TIME  = 3   -- giữ bật (giây)
+local START_DELAY = 62    -- chờ trước khi bật (giây)
+local ACTIVE_TIME  = 65   -- giữ bật (giây)
 local FIRE_INTERVAL = 0.4 -- khoảng giữa mỗi lần gửi (giây)
 
 -- cố gắng tìm remote giống code gốc: ReplicatedStorage.BridgeNet2.dataRemoteEvent
