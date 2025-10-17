@@ -1,8 +1,8 @@
 -- Auto Shield (standalone)
 -- Hành vi: sau 3s bật shield (true), sau 3s tắt shield (false). Không cần code gốc.
 
-local START_DELAY = 3   -- chờ trước khi bật (giây)
-local ACTIVE_TIME  = 3  -- thời gian giữ bật (giây)
+local START_DELAY = 56   -- chờ trước khi bật (giây)
+local ACTIVE_TIME  = 60  -- thời gian giữ bật (giây)
 
 -- cố gắng tìm remote giống code gốc: ReplicatedStorage.BridgeNet2.dataRemoteEvent
 local remote
