@@ -7,7 +7,7 @@ local FIRE_INTERVAL = 0.4 -- khoảng giữa mỗi lần gửi (giây)
 
 -- Các lần Spam M1
 local schedule = {
-    {66, 65},  -- bật lúc 66s, tắt lúc 65s
+    {62, 66},  -- bật lúc 62s, tắt lúc 66s
     {80, 84},  -- bật lúc 80s, tắt lúc 84s
     {94, 98},  -- bật lúc 94s, tắt lúc 98s
 }
