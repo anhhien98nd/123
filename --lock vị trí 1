@@ -37,7 +37,7 @@ task.spawn(function()
 	end)
 
 	-- Tắt tại giây 110 tổng (sau 100s kể từ lúc bật)
-	task.wait(133)
+	task.wait(134)
 	STATE.tp1 = false
-	print("[AUTO] Tắt TP1 Lock tại giây 110 (tổng)")
+	print("[AUTO] Tắt TP1 Lock tại giây 134 (tổng)")
 end)
