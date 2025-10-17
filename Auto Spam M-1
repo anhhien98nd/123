@@ -7,9 +7,9 @@ local FIRE_INTERVAL = 0.4 -- khoảng giữa mỗi lần gửi (giây)
 
 -- Schedule: mỗi entry = {start, end}
 local schedule = {
-    {56, 59},  -- bật lúc 56s, tắt lúc 59s
-    {68, 71},  -- bật lúc 68s, tắt lúc 71s
-    {80, 83},  -- bật lúc 80s, tắt lúc 83s
+    {59, 63},  -- bật lúc 59s, tắt lúc 63s
+    {73, 77},  -- bật lúc 73s, tắt lúc 77s
+    {87, 91},  -- bật lúc 87s, tắt lúc 91s
 }
 
 -- tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback: tìm descendants)
