@@ -9,7 +9,7 @@ local schedule = {
     {13, 22},  -- bắt đầu 13s, kết thúc 22s
     {32, 41},  -- bắt đầu 32s, kết thúc 41s
     {51, 56},  -- bắt đầu 51s, kết thúc 56s
-    {101, 105},  -- bắt đầu 101s, kết thúc 105s
+    {127, 131},  -- bắt đầu 101s, kết thúc 105s
 }
 
 -- tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback: tìm descendants)
