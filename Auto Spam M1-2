@@ -1,11 +1,18 @@
--- Auto Spam M1 (standalone)
--- Bật sau 62s, chạy 65s, rồi tắt. Không cần code gốc / GUI.
+-- Auto Spam M1 (multi schedule, standalone)
+-- Mỗi entry trong schedule: {start_time, duration}
+-- => start_time: thời điểm bắt đầu (tính từ lúc script bắt đầu)
+-- => duration: thời gian hoạt động (giây)
 
-local START_DELAY = 62    -- chờ trước khi bật (giây)
-local ACTIVE_TIME  = 65   -- giữ bật (giây)
 local FIRE_INTERVAL = 0.4 -- khoảng giữa mỗi lần gửi (giây)
 
--- cố gắng tìm remote giống code gốc: ReplicatedStorage.BridgeNet2.dataRemoteEvent
+-- Các lần Spam M1
+local schedule = {
+    {62, 65},  -- bắt đầu 62s, chạy 65s  → kết thúc 127s
+    {74, 77},  -- bắt đầu 74s, chạy 77s  → kết thúc 151s
+    {86, 89},  -- bắt đầu 86s, chạy 89s  → kết thúc 175s
+}
+
+-- Tìm remote: ReplicatedStorage → BridgeNet2 → dataRemoteEvent
 local remote
 pcall(function()
     local rs = game:GetService("ReplicatedStorage")
@@ -13,7 +20,6 @@ pcall(function()
     if bridge then
         remote = bridge:FindFirstChild("dataRemoteEvent")
     end
-    -- fallback: tìm trong toàn bộ ReplicatedStorage nếu chưa tìm thấy
     if not remote then
         for _, v in ipairs(rs:GetDescendants()) do
             if v.Name == "dataRemoteEvent" then
@@ -24,7 +30,7 @@ pcall(function()
     end
 end)
 
--- thiết lập bf: dùng buffer.fromstring nếu có, ngược lại trả nguyên chuỗi
+-- buffer handler
 local bf
 if type(buffer) == "table" and type(buffer.fromstring) == "function" then
     bf = buffer.fromstring
@@ -47,24 +53,29 @@ local function safeFire()
     end
 end
 
--- main
-task.spawn(function()
-    task.wait(START_DELAY)
-    print("[Auto Spam M1] ON")
-    local t0 = tick()
-    local running = true
+-- Chạy từng schedule
+local tick0 = tick()
 
-    task.spawn(function()
-        while running and tick() - t0 < ACTIVE_TIME do
-            safeFire()
-            task.wait(FIRE_INTERVAL)
-        end
-    end)
+for i, window in ipairs(schedule) do
+    local start_time, duration = window[1], window[2]
+    if type(start_time) == "number" and type(duration) == "number" and duration > 0 then
+        task.spawn(function()
+            -- đợi tới thời điểm bắt đầu
+            local wait_time = tick0 + start_time - tick()
+            if wait_time > 0 then task.wait(wait_time) end
 
-    -- đợi hết thời gian hoạt động
-    while tick() - t0 < ACTIVE_TIME do
-        task.wait(0.1)
+            local end_time = tick0 + start_time + duration
+            print(("[Auto Spam M1] #%d ON (%.1fs -> %.1fs)"):format(i, start_time, start_time + duration))
+
+            -- spam trong khoảng thời gian hoạt động
+            while tick() < end_time do
+                safeFire()
+                task.wait(FIRE_INTERVAL)
+            end
+
+            print(("[Auto Spam M1] #%d OFF (kết thúc %.1fs)"):format(i, start_time + duration))
+        end)
+    else
+        warn(("[Auto Spam M1] Schedule #%d không hợp lệ (start=%s, duration=%s)"):format(i, tostring(start_time), tostring(duration)))
     end
-    running = false
-    print("[Auto Spam M1] OFF")
-end)
+end
