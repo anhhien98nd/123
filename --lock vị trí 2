@@ -1,50 +1,43 @@
---[[ 
-🚫 KHÔNG CHẠY CODE GỐC
-(Phần GUI, nút, mkBtn... đã bị vô hiệu hoá)
-]]
-
--- ✅ PHẦN THỰC TẾ: AUTO BẬT TP2 LOCK SAU 10 GIÂY, TẮT SAU 96 GIÂY
+-- Auto TP1 Lock: bật tại giây 10, tắt tại giây 96 (tổng)
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
-local STATE = { tp2 = false }
+local STATE = { tp1 = false }
 
 task.spawn(function()
-	-- Chờ 10 giây trước khi bật
+	-- Chờ 10s rồi bật
 	task.wait(10)
-	print("[AUTO] Bật TP2 Lock sau 10 giây")
+	print("[AUTO] Bật TP1 Lock tại giây 10")
+	STATE.tp1 = true
 
-	STATE.tp2 = true
 	local pos = Vector3.new(42.29, 3.63, -132.49)
-
-	-- Lưu hướng nhìn hiện tại nếu có
 	local look
 	pcall(function()
-		look = p.Character
-			and p.Character:FindFirstChild("HumanoidRootPart")
+		look = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
 			and p.Character.HumanoidRootPart.CFrame.LookVector
 	end)
 
-	-- Bắt đầu vòng lặp giữ vị trí TP2 Lock
-	local lockThread = task.spawn(function()
-		while STATE.tp2 do
+	-- Giữ lock khi bật
+	task.spawn(function()
+		while STATE.tp1 do
 			task.wait()
 			local c = p.Character
-			if c and c:FindFirstChild("HumanoidRootPart") then
-				local h = c.HumanoidRootPart
-				h.Velocity = Vector3.new()
-				if look then
-					h.CFrame = CFrame.new(pos, pos + look)
-				else
-					h.CFrame = CFrame.new(pos)
+			if c then
+				local hrp = c:FindFirstChild("HumanoidRootPart")
+				if hrp then
+					hrp.Velocity = Vector3.new()
+					if look then
+						hrp.CFrame = CFrame.new(pos, pos + look)
+					else
+						hrp.CFrame = CFrame.new(pos)
+					end
 				end
 			end
 		end
 	end)
 
-	-- Sau 96 giây tự động tắt TP2 Lock
-	task.wait(96)
-	STATE.tp2 = false
-	print("[AUTO] Tắt TP2 Lock sau 96 giây")
-	-- vòng lặp lock tự dừng khi STATE.tp2 = false
+	-- Tính đúng theo tổng thời gian 96s → chỉ chờ thêm (96 - 10) = 86s
+	task.wait(86)
+	STATE.tp1 = false
+	print("[AUTO] Tắt TP1 Lock tại giây 96 (tổng)")
 end)
