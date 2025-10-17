@@ -3,7 +3,7 @@
 (Phần GUI, nút, mkBtn... đã bị vô hiệu hoá)
 ]]
 
--- ✅ PHẦN THỰC TẾ: AUTO BẬT TP2 LOCK SAU 10 GIÂY, TẮT SAU 3 GIÂY
+-- ✅ PHẦN THỰC TẾ: AUTO BẬT TP2 LOCK SAU 10 GIÂY, TẮT SAU 96 GIÂY
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
@@ -42,9 +42,9 @@ task.spawn(function()
 		end
 	end)
 
-	-- Sau 3 giây tự động tắt TP2 Lock
-	task.wait(3)
+	-- Sau 96 giây tự động tắt TP2 Lock
+	task.wait(96)
 	STATE.tp2 = false
-	print("[AUTO] Tắt TP2 Lock sau 3 giây")
+	print("[AUTO] Tắt TP2 Lock sau 96 giây")
 	-- vòng lặp lock tự dừng khi STATE.tp2 = false
 end)
