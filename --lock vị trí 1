@@ -1,28 +1,26 @@
--- Auto TP1 Lock: bật sau 10s, tắt sau 96s (standalone)
+-- Auto TP1 Lock: bật tại giây 10, tắt tại giây 96 (tổng)
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
 local STATE = { tp1 = false }
 
 task.spawn(function()
-	-- chờ 10 giây rồi bật
+	-- Chờ 10s rồi bật
 	task.wait(10)
-	print("[AUTO] Bật TP1 Lock sau 10 giây")
+	print("[AUTO] Bật TP1 Lock tại giây 10")
 	STATE.tp1 = true
 
-	-- vị trí TP1 (giữ nguyên từ code gốc)
-	local pos = Vector3.new(40,3.63,-130.14)
-
-	-- lưu look vector (nếu có) — dùng try/catch an toàn
+	local pos = Vector3.new(40, 3.63, -130.14)
 	local look
 	pcall(function()
-		look = p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Character.HumanoidRootPart.CFrame.LookVector
+		look = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+			and p.Character.HumanoidRootPart.CFrame.LookVector
 	end)
 
-	-- vòng lặp giữ TP1 Lock
-	local lockThread = task.spawn(function()
+	-- Giữ lock khi bật
+	task.spawn(function()
 		while STATE.tp1 do
-			task.wait() -- chạy mỗi frame; thay bằng task.wait(0.03) nếu muốn nhẹ hơn
+			task.wait()
 			local c = p.Character
 			if c then
 				local hrp = c:FindFirstChild("HumanoidRootPart")
@@ -38,9 +36,8 @@ task.spawn(function()
 		end
 	end)
 
-	-- sau 96 giây tự tắt TP1
-	task.wait(96)
+	-- Tính đúng theo tổng thời gian 96s → chỉ chờ thêm (96 - 10) = 86s
+	task.wait(86)
 	STATE.tp1 = false
-	print("[AUTO] Tắt TP1 Lock sau 96 giây")
-	-- lockThread sẽ tự thoát khi STATE.tp1 = false
+	print("[AUTO] Tắt TP1 Lock tại giây 96 (tổng)")
 end)
