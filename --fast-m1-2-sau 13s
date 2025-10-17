@@ -1,5 +1,5 @@
 -- Auto Fast M1 (standalone, không cần code gốc)
--- Bật sau 10s, chạy 10s, rồi tắt. Không tạo GUI, không phụ thuộc code gốc.
+-- Bật sau 13s, chạy 54s, rồi tắt. Không tạo GUI, không phụ thuộc code gốc.
 
 -- cấu hình
 local START_DELAY = 13    -- chờ trước khi bật (giây)
