@@ -8,7 +8,7 @@ local FIRE_INTERVAL = 0.65 -- khoảng giữa mỗi lần gửi (giây)
 local schedule = {
     {13, 22},  -- bắt đầu 13s, kết thúc 22s
     {32, 41},  -- bắt đầu 32s, kết thúc 41s
-    {51, 54},  -- bắt đầu 51s, kết thúc 54s
+    {51, 53},  -- bắt đầu 51s, kết thúc 53s
     {127, 131},  -- bắt đầu 101s, kết thúc 105s
 }
 
