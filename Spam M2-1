@@ -1,69 +1,89 @@
--- Auto Spam M2 (standalone)
--- Bật sau 13.5s, chạy 3s, rồi tắt. Không cần code gốc / GUI.
+-- Auto Spam M2 (schedule nhiều cửa sổ)
+-- Dán vào executor — độc lập, không cần GUI hay code gốc
 
-local START_DELAY   = 13      -- chờ trước khi bật (giây)
-local ACTIVE_TIME   = 22      -- giữ bật (giây)
-local FIRE_INTERVAL = 0.65   -- khoảng giữa mỗi lần gửi (giây)
+local FIRE_INTERVAL = 0.65 -- khoảng giữa mỗi lần gửi (giây)
 
--- Tìm remote: ReplicatedStorage → BridgeNet2 → dataRemoteEvent
+-- Danh sách cửa sổ: {start_seconds, end_seconds}
+-- Mỗi giá trị là thời điểm tính từ lúc script bắt đầu (tick0)
+local schedule = {
+    {13, 22},  -- bắt đầu 13s, kết thúc 22s
+    {32, 41},  -- bắt đầu 32s, kết thúc 41s
+    {51, 54},  -- bắt đầu 51s, kết thúc 54s
+}
+
+-- tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback: tìm descendants)
 local remote
 pcall(function()
-	local rs = game:GetService("ReplicatedStorage")
-	local bridge = rs:FindFirstChild("BridgeNet2")
-	if bridge then
-		remote = bridge:FindFirstChild("dataRemoteEvent")
-	end
-	-- fallback: tìm descendant có tên "dataRemoteEvent"
-	if not remote then
-		for _, v in ipairs(rs:GetDescendants()) do
-			if v.Name == "dataRemoteEvent" then
-				remote = v
-				break
-			end
-		end
-	end
+    local rs = game:GetService("ReplicatedStorage")
+    local bridge = rs:FindFirstChild("BridgeNet2")
+    if bridge then
+        remote = bridge:FindFirstChild("dataRemoteEvent")
+    end
+    if not remote then
+        for _, v in ipairs(rs:GetDescendants()) do
+            if v.Name == "dataRemoteEvent" then
+                remote = v
+                break
+            end
+        end
+    end
 end)
 
--- Thiết lập bf(): ưu tiên buffer.fromstring nếu có, fallback trả chuỗi
+-- bf(): ưu tiên buffer.fromstring nếu có, fallback trả chuỗi
 local bf
 if type(buffer) == "table" and type(buffer.fromstring) == "function" then
-	bf = buffer.fromstring
+    bf = buffer.fromstring
 else
-	bf = function(s) return s end
+    bf = function(s) return s end
 end
 
--- Payload Spam M2 (giữ nguyên từ code gốc)
 local payload_str = "\019\000\000\0000201100101186595482\000"
 
--- Hàm gửi an toàn
 local function safeFire()
-	if remote and bf then
-		pcall(function()
-			remote:FireServer({ { bf(payload_str) }, "\019" })
-		end)
-	else
-		if not safeFire._warned then
-			safeFire._warned = true
-			warn("[Auto Spam M2] remote hoặc bf không khả dụng; không gửi được.")
-		end
-	end
+    if remote and bf then
+        pcall(function()
+            remote:FireServer({ { bf(payload_str) }, "\019" })
+        end)
+    else
+        if not safeFire._warned then
+            safeFire._warned = true
+            warn("[Auto Spam M2] remote hoặc bf không khả dụng; không gửi được.")
+        end
+    end
 end
 
--- Main
-task.spawn(function()
-	task.wait(START_DELAY)
-	print("[Auto Spam M2] ON")
-	local t0 = tick()
-	local running = true
+-- start scheduling
+local tick0 = tick()
 
-	task.spawn(function()
-		while running and tick() - t0 < ACTIVE_TIME do
-			safeFire()
-			task.wait(FIRE_INTERVAL)
-		end
-	end)
+for i, win in ipairs(schedule) do
+    local startT, endT = win[1], win[2]
+    if type(startT) ~= "number" or type(endT) ~= "number" or endT <= startT then
+        warn(("[Auto Spam M2] Schedule #%d không hợp lệ (start=%s end=%s) - bỏ qua"):format(i, tostring(startT), tostring(endT)))
+    else
+        task.spawn(function()
+            -- chờ đến thời điểm bắt đầu (tính từ tick0)
+            local now = tick()
+            local waitUntil = tick0 + startT
+            local toWait = waitUntil - now
+            if toWait > 0 then
+                task.wait(toWait)
+            end
 
-	task.wait(ACTIVE_TIME)
-	running = false
-	print("[Auto Spam M2] OFF")
-end)
+            -- nếu đã vượt quá end time, bỏ qua
+            if tick() >= tick0 + endT then
+                warn(("[Auto Spam M2] Schedule #%d đã trôi qua trước khi bắt đầu — bỏ qua."):format(i))
+                return
+            end
+
+            print(("[Auto Spam M2] Schedule #%d ON (%.1fs -> %.1fs)"):format(i, startT, endT))
+
+            -- spam trong cửa sổ thời gian
+            while tick() < tick0 + endT do
+                safeFire()
+                task.wait(FIRE_INTERVAL)
+            end
+
+            print(("[Auto Spam M2] Schedule #%d OFF (kết thúc %.1fs)"):format(i, endT))
+        end)
+    end
+end
