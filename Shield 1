@@ -5,8 +5,8 @@
 
 local schedule = {
     {62, 66},  -- bật lúc 62s, tắt lúc 66s
-    {74, 78},  -- bật lúc 74s, tắt lúc 78s
-    {86, 90},  -- bật lúc 86s, tắt lúc 90s
+    {80, 84},  -- bật lúc 80s, tắt lúc 84s
+    {94, 90},  -- bật lúc 94s, tắt lúc 98s
 }
 
 -- Tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent
