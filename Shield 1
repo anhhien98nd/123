@@ -1,10 +1,15 @@
--- Auto Shield (standalone)
--- Hành vi: sau 3s bật shield (true), sau 3s tắt shield (false). Không cần code gốc.
+-- Auto Shield (multi schedule, standalone)
+-- Mỗi entry trong schedule = {start_time, duration}
+-- start_time: thời điểm bắt đầu (tính bằng giây kể từ khi script chạy)
+-- duration: thời gian giữ bật shield (giây)
 
-local START_DELAY = 3   -- chờ trước khi bật (giây)
-local ACTIVE_TIME  = 3  -- thời gian giữ bật (giây)
+local schedule = {
+    {62, 66},  -- bật sau 62s, giữ 66s → tắt lúc 128s
+    {74, 78},  -- bật sau 74s, giữ 78s → tắt lúc 152s
+    {86, 90},  -- bật sau 86s, giữ 90s → tắt lúc 176s
+}
 
--- cố gắng tìm remote giống code gốc: ReplicatedStorage.BridgeNet2.dataRemoteEvent
+-- Tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent
 local remote
 pcall(function()
     local rs = game:GetService("ReplicatedStorage")
@@ -12,7 +17,6 @@ pcall(function()
     if bridge then
         remote = bridge:FindFirstChild("dataRemoteEvent")
     end
-    -- fallback: tìm descendant có tên "dataRemoteEvent"
     if not remote then
         for _, v in ipairs(rs:GetDescendants()) do
             if v.Name == "dataRemoteEvent" then
@@ -36,13 +40,29 @@ local function safeFireShield(state)
     end
 end
 
--- main
-task.spawn(function()
-    task.wait(START_DELAY)
-    print("[Auto Shield] BẬT")
-    safeFireShield(true)
+-- MAIN LOOP (xử lý nhiều khoảng thời gian)
+local tick0 = tick()
 
-    task.wait(ACTIVE_TIME)
-    safeFireShield(false)
-    print("[Auto Shield] TẮT")
-end)
+for i, window in ipairs(schedule) do
+    local start_time, duration = window[1], window[2]
+    if type(start_time) == "number" and type(duration) == "number" and duration > 0 then
+        task.spawn(function()
+            -- Chờ đến thời điểm bắt đầu
+            local wait_time = tick0 + start_time - tick()
+            if wait_time > 0 then task.wait(wait_time) end
+
+            local end_time = tick0 + start_time + duration
+            print(("[Auto Shield] #%d BẬT (%.1fs → %.1fs)"):format(i, start_time, start_time + duration))
+            safeFireShield(true)
+
+            -- Giữ trong khoảng thời gian hoạt động
+            local remain = end_time - tick()
+            if remain > 0 then task.wait(remain) end
+
+            safeFireShield(false)
+            print(("[Auto Shield] #%d TẮT (kết thúc %.1fs)"):format(i, start_time + duration))
+        end)
+    else
+        warn(("[Auto Shield] Schedule #%d không hợp lệ (start=%s, duration=%s)"):format(i, tostring(start_time), tostring(duration)))
+    end
+end
