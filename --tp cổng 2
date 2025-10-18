@@ -12,27 +12,41 @@ end)
 ]]
 
 -- ==============================================
--- ✅ PHẦN CODE CHẠY THỰC TẾ: AUTO TELEPORT
+-- ✅ PHẦN CODE CHẠY THỰC TẾ: AUTO TELEPORT (Cổng 2)
 -- ==============================================
 
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
+local running = true
 
 -- 🕒 AUTO TELE "Cổng 2" SAU 3 GIÂY RỒI TẮT SAU 1 GIÂY
 task.spawn(function()
 	task.wait(3)
+	if not running then return end
 	print("[AUTO] Dịch chuyển tới Cổng 2 sau 3 giây")
 
-	-- Vị trí cổng 2
+	-- Vị trí Cổng 2
 	local v = Vector3.new(18.37334884643555, 0.37274569272994995, -140.72775268554688)
 
 	local chr = p.Character or p.CharacterAdded:Wait()
-	local hrp = chr:FindFirstChild("HumanoidRootPart")
+	local hrp = chr and chr:FindFirstChild("HumanoidRootPart")
 	if hrp then
-		hrp.CFrame = CFrame.new(v + Vector3.new(0,5,0))
+		-- Dịch chuyển lên một chút để tránh kẹt map
+		hrp.CFrame = CFrame.new(v + Vector3.new(0, 5, 0))
 	end
 
-	-- Giữ trong 1 giây rồi “tắt”
+	-- Giữ trong 1 giây rồi dừng
 	task.wait(1)
+	if not running then return end
 	print("[AUTO] Dừng teleport sau 1 giây")
-end) 
+end)
+
+-- ♻️ TỰ ĐỘNG CLEAR SCRIPT SAU 140 GIÂY (độc lập hoàn toàn)
+task.spawn(function()
+	task.wait(140)
+	running = false
+	print("[AUTO] Script Auto Tele Cổng 2 đã tự động clear sau 140 giây")
+	pcall(function()
+		script:Destroy()
+	end)
+end)
