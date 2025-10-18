@@ -1,15 +1,15 @@
--- Auto Shield (multi schedule, standalone + auto self-destroy)
+-- Auto Shield (multi schedule, standalone)
 -- Mỗi entry trong schedule = {start_time, end_time}
 -- start_time: thời điểm bắt đầu (giây kể từ khi script chạy)
 -- end_time: thời điểm kết thúc (giây kể từ khi script chạy)
 
 local schedule = {
-    {71, 79},   -- bật lúc 71s, tắt lúc 79s
-    {94, 102},  -- bật lúc 94s, tắt lúc 102s
-    {115, 124}, -- bật lúc 115s, tắt lúc 124s
+    {71, 79},  -- bật lúc 62s, tắt lúc 66s
+    {94, 102},  -- bật lúc 80s, tắt lúc 84s
+    {115, 124},  -- bật lúc 94s, tắt lúc 98s
 }
 
--- 🔍 Tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent
+-- Tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent
 local remote
 pcall(function()
     local rs = game:GetService("ReplicatedStorage")
@@ -27,7 +27,6 @@ pcall(function()
     end
 end)
 
--- 🛡️ Hàm bật/tắt khiên an toàn
 local function safeFireShield(state)
     if remote then
         pcall(function()
@@ -41,21 +40,18 @@ local function safeFireShield(state)
     end
 end
 
--- 🧭 MAIN LOOP (xử lý theo nhiều khoảng thời gian)
+-- MAIN LOOP (xử lý nhiều khoảng thời gian)
 local tick0 = tick()
-local total = #schedule
-local finished = 0
 
 for i, window in ipairs(schedule) do
     local start_time, end_time = window[1], window[2]
-
     if type(start_time) == "number" and type(end_time) == "number" and end_time > start_time then
         task.spawn(function()
-            -- chờ tới lúc bật
+            -- chờ đến lúc bật
             local wait_time = tick0 + start_time - tick()
             if wait_time > 0 then task.wait(wait_time) end
 
-            print(("[Auto Shield] #%d 🟢 BẬT (%.1fs → %.1fs)"):format(i, start_time, end_time))
+            print(("[Auto Shield] #%d BẬT (%.1fs → %.1fs)"):format(i, start_time, end_time))
             safeFireShield(true)
 
             -- chờ tới lúc tắt
@@ -63,24 +59,9 @@ for i, window in ipairs(schedule) do
             if remain > 0 then task.wait(remain) end
 
             safeFireShield(false)
-            print(("[Auto Shield] #%d 🔴 TẮT (%.1fs)"):format(i, end_time))
-            finished += 1
-
-            -- ✅ Nếu tất cả schedule đều hoàn tất → tự xóa script
-            if finished >= total then
-                print("[Auto Shield] ✅ Toàn bộ schedule đã hoàn tất, đang tự dọn và xoá script...")
-
-                task.delay(1, function()
-                    -- Xóa biến & môi trường thực thi
-                    remote, safeFireShield, schedule = nil, nil, nil
-                    table.clear(getfenv())
-                    collectgarbage("collect")
-
-                    print("[Auto Shield] 🧹 Script đã được tự xoá hoàn toàn khỏi bộ nhớ.")
-                end)
-            end
+            print(("[Auto Shield] #%d TẮT (%.1fs)"):format(i, end_time))
         end)
     else
         warn(("[Auto Shield] Schedule #%d không hợp lệ (start=%s, end=%s)"):format(i, tostring(start_time), tostring(end_time)))
     end
-end
+end 
