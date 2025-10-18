@@ -21,9 +21,9 @@ local p = Players.LocalPlayer
 -- 🕒 AUTO TELE "Cổng 2" SAU 3 GIÂY RỒI TẮT SAU 1 GIÂY
 task.spawn(function()
 	task.wait(3)
-	print("[AUTO] 🚀 Dịch chuyển tới Cổng 2 sau 3 giây")
+	print("[AUTO] Dịch chuyển tới Cổng 2 sau 3 giây")
 
-	-- ⚙️ Vị trí Cổng 2
+	-- Vị trí cổng 2
 	local v = Vector3.new(18.37334884643555, 0.37274569272994995, -140.72775268554688)
 
 	local chr = p.Character or p.CharacterAdded:Wait()
@@ -34,21 +34,5 @@ task.spawn(function()
 
 	-- Giữ trong 1 giây rồi “tắt”
 	task.wait(1)
-	print("[AUTO] ⏹ Dừng teleport sau 1 giây")
-
-	-- 🧹 Tự động xoá script sau khi hoàn tất
-	task.delay(0.5, function()
-		print("[AUTO] 🧹 Đang dọn dẹp và xoá script khỏi bộ nhớ...")
-
-		-- Xoá toàn bộ biến trong môi trường hiện tại
-		local env = getfenv()
-		for k in pairs(env) do
-			env[k] = nil
-		end
-
-		-- Gọi bộ gom rác của Lua
-		collectgarbage("collect")
-
-		print("[AUTO] ✅ Script đã tự xoá hoàn toàn khỏi bộ nhớ.")
-	end)
-end)
+	print("[AUTO] Dừng teleport sau 1 giây")
+end) 
