@@ -4,10 +4,10 @@
 
 local FIRE_INTERVAL = 0.1 -- khoảng cách giữa mỗi lần gửi (giây)
 
--- lịch hoạt động (thời điểm bắt đầu và tắt)
+-- lịch hoạt động (thời điểm bật / tắt)
 local schedule = {
-    {13, 55},  -- bật lúc 13s, tắt lúc 55s  
-    {127, 133},  -- bật lúc 127s, tắt lúc 133s  
+    {13, 55},   -- bật lúc 13s, tắt lúc 55s  
+    {127, 133}, -- bật lúc 127s, tắt lúc 133s  
 }
 
 -- tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback tìm descendants)
@@ -38,7 +38,11 @@ end
 
 local payload_str = "\019\000\000\0000201000113686372022\000"
 
+-- Flag điều khiển
+local running = true
+
 local function safeFire()
+    if not running then return end
     if remote and bf then
         pcall(function()
             remote:FireServer({ { bf(payload_str) }, "\019" })
@@ -69,14 +73,14 @@ for i, win in ipairs(schedule) do
             local toWait = startTime - tick()
             if toWait > 0 then task.wait(toWait) end
 
-            if tick() >= endTime then
+            if tick() >= endTime or not running then
                 warn(("[Auto Fast M1] Schedule #%d đã trôi qua — bỏ qua"):format(i))
                 return
             end
 
             print(("[Auto Fast M1] #%d ON (%.1fs -> %.1fs)"):format(i, startSec, endSec))
 
-            while tick() < endTime do
+            while tick() < endTime and running do
                 safeFire()
                 task.wait(FIRE_INTERVAL)
             end
@@ -84,4 +88,12 @@ for i, win in ipairs(schedule) do
             print(("[Auto Fast M1] #%d OFF (%.1fs)"):format(i, endSec))
         end)
     end
-end 
+end
+
+-- Auto clear sau 140 giây
+task.spawn(function()
+    task.wait(140)
+    running = false
+    print("[Auto Fast M1] Đã hết 140s — clear toàn bộ script.")
+    script:Destroy()
+end)
