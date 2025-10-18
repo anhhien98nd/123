@@ -4,16 +4,12 @@
 -- end_time: thời điểm kết thúc (giây kể từ khi script chạy)
 
 local schedule = {
-    {71, 79},   -- bật lúc 71s, tắt lúc 79s
+    {71, 79},  -- bật lúc 71s, tắt lúc 79s
     {94, 102},  -- bật lúc 94s, tắt lúc 102s
-    {115, 124}, -- bật lúc 115s, tắt lúc 124s
+    {115, 124},  -- bật lúc 115s, tắt lúc 124s
 }
 
--- ⏱ Thời gian tự động clear (dễ chỉnh)
-local AUTO_CLEAR = 140
-local running = true
-
--- 🔍 Tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent
+-- Tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent
 local remote
 pcall(function()
     local rs = game:GetService("ReplicatedStorage")
@@ -31,9 +27,7 @@ pcall(function()
     end
 end)
 
--- 🛡️ Gửi tín hiệu bật/tắt Shield an toàn
 local function safeFireShield(state)
-    if not running then return end
     if remote then
         pcall(function()
             remote:FireServer({ state, "\024" })
@@ -46,7 +40,7 @@ local function safeFireShield(state)
     end
 end
 
--- 🚀 MAIN LOOP (xử lý nhiều khoảng thời gian)
+-- MAIN LOOP (xử lý nhiều khoảng thời gian)
 local tick0 = tick()
 
 for i, window in ipairs(schedule) do
@@ -56,7 +50,6 @@ for i, window in ipairs(schedule) do
             -- chờ đến lúc bật
             local wait_time = tick0 + start_time - tick()
             if wait_time > 0 then task.wait(wait_time) end
-            if not running then return end
 
             print(("[Auto Shield] #%d BẬT (%.1fs → %.1fs)"):format(i, start_time, end_time))
             safeFireShield(true)
@@ -64,7 +57,6 @@ for i, window in ipairs(schedule) do
             -- chờ tới lúc tắt
             local remain = tick0 + end_time - tick()
             if remain > 0 then task.wait(remain) end
-            if not running then return end
 
             safeFireShield(false)
             print(("[Auto Shield] #%d TẮT (%.1fs)"):format(i, end_time))
@@ -72,14 +64,4 @@ for i, window in ipairs(schedule) do
     else
         warn(("[Auto Shield] Schedule #%d không hợp lệ (start=%s, end=%s)"):format(i, tostring(start_time), tostring(end_time)))
     end
-end  
-
--- ♻️ TỰ ĐỘNG CLEAR SCRIPT SAU AUTO_CLEAR GIÂY
-task.spawn(function()
-    task.wait(AUTO_CLEAR)
-    running = false
-    print(("[Auto Shield] Đã hết %ds — script sẽ tự động clear."):format(AUTO_CLEAR))
-    pcall(function()
-        script:Destroy()
-    end)
-end)
+end 
