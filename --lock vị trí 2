@@ -1,13 +1,13 @@
--- Auto TP1 Lock: bật tại giây 10, tắt tại giây 110 (tổng)
+-- 🔒 Auto TP1 Lock: bật tại giây 10, tắt tại giây 134 (tổng)
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
 local STATE = { tp1 = false }
 
 task.spawn(function()
-	-- Chờ 10s rồi bật
+	-- ⏳ Chờ 10s rồi bật
 	task.wait(10)
-	print("[AUTO] Bật TP1 Lock tại giây 10")
+	print("[AUTO] ✅ Bật TP1 Lock tại giây 10")
 	STATE.tp1 = true
 
 	local pos = Vector3.new(42.29, 3.63, -132.49)
@@ -17,7 +17,7 @@ task.spawn(function()
 			and p.Character.HumanoidRootPart.CFrame.LookVector
 	end)
 
-	-- Giữ lock khi bật
+	-- 🔁 Giữ lock khi bật
 	task.spawn(function()
 		while STATE.tp1 do
 			task.wait()
@@ -36,8 +36,23 @@ task.spawn(function()
 		end
 	end)
 
-	-- Tắt tại giây 110 tổng (sau 100s kể từ lúc bật)
-	task.wait(134)
+	-- 🕒 Tắt tại giây 134 tổng (tức là sau 124s kể từ bật)
+	task.wait(124)
 	STATE.tp1 = false
-	print("[AUTO] Tắt TP1 Lock tại giây 134 (tổng)")
+	print("[AUTO] 📴 Tắt TP1 Lock tại giây 134 (tổng)")
+
+	-- 🚮 Tự động xoá toàn bộ script sau khi hoàn tất
+	task.delay(1, function()
+		print("[AUTO] 🧹 Dọn dẹp và tự xoá script khỏi bộ nhớ...")
+
+		-- Xóa biến và môi trường hiện tại
+		local env = getfenv()
+		for k in pairs(env) do
+			env[k] = nil
+		end
+
+		-- Thu gom rác
+		collectgarbage("collect")
+		print("[AUTO] ✅ Script đã được xoá hoàn toàn khỏi bộ nhớ.")
+	end)
 end)
