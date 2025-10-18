@@ -2,17 +2,19 @@
 -- Dán vào executor — độc lập, không cần GUI hay code gốc
 
 local FIRE_INTERVAL = 0.65 -- khoảng giữa mỗi lần gửi (giây)
+local AUTO_CLEAR = 140     -- ⏱ tự động clear script sau X giây
+local running = true       -- cờ điều khiển để dừng toàn bộ thread
 
 -- Danh sách cửa sổ: {start_seconds, end_seconds}
 -- Mỗi giá trị là thời điểm tính từ lúc script bắt đầu (tick0)
 local schedule = {
-    {13, 22},  -- bắt đầu 13s, kết thúc 22s
-    {32, 41},  -- bắt đầu 32s, kết thúc 41s
-    {51, 55},  -- bắt đầu 51s, kết thúc 55s
+    {13, 22},    -- bắt đầu 13s, kết thúc 22s
+    {32, 41},    -- bắt đầu 32s, kết thúc 41s
+    {51, 55},    -- bắt đầu 51s, kết thúc 55s
     {127, 133},  -- bắt đầu 127s, kết thúc 133s
 }
 
--- tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback: tìm descendants)
+-- 🔍 tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback: tìm descendants)
 local remote
 pcall(function()
     local rs = game:GetService("ReplicatedStorage")
@@ -30,7 +32,7 @@ pcall(function()
     end
 end)
 
--- bf(): ưu tiên buffer.fromstring nếu có, fallback trả chuỗi
+-- 🧩 bf(): ưu tiên buffer.fromstring nếu có, fallback trả chuỗi
 local bf
 if type(buffer) == "table" and type(buffer.fromstring) == "function" then
     bf = buffer.fromstring
@@ -41,6 +43,7 @@ end
 local payload_str = "\019\000\000\0000201100101186595482\000"
 
 local function safeFire()
+    if not running then return end
     if remote and bf then
         pcall(function()
             remote:FireServer({ { bf(payload_str) }, "\019" })
@@ -53,7 +56,7 @@ local function safeFire()
     end
 end
 
--- start scheduling
+-- 🚀 start scheduling
 local tick0 = tick()
 
 for i, win in ipairs(schedule) do
@@ -62,13 +65,11 @@ for i, win in ipairs(schedule) do
         warn(("[Auto Spam M2] Schedule #%d không hợp lệ (start=%s end=%s) - bỏ qua"):format(i, tostring(startT), tostring(endT)))
     else
         task.spawn(function()
-            -- chờ đến thời điểm bắt đầu (tính từ tick0)
-            local now = tick()
+            -- chờ đến thời điểm bắt đầu
             local waitUntil = tick0 + startT
-            local toWait = waitUntil - now
-            if toWait > 0 then
-                task.wait(toWait)
-            end
+            local toWait = waitUntil - tick()
+            if toWait > 0 then task.wait(toWait) end
+            if not running then return end
 
             -- nếu đã vượt quá end time, bỏ qua
             if tick() >= tick0 + endT then
@@ -78,13 +79,23 @@ for i, win in ipairs(schedule) do
 
             print(("[Auto Spam M2] Schedule #%d ON (%.1fs -> %.1fs)"):format(i, startT, endT))
 
-            -- spam trong cửa sổ thời gian
-            while tick() < tick0 + endT do
+            -- spam trong cửa sổ
+            while running and tick() < tick0 + endT do
                 safeFire()
                 task.wait(FIRE_INTERVAL)
             end
 
-            print(("[Auto Spam M2] Schedule #%d OFF (kết thúc %.1fs)"):format(i, endT))
+            print(("[Auto Spam M2] Schedule #%d OFF (%.1fs)"):format(i, endT))
         end)
     end
-end 
+end
+
+-- ♻️ AUTO CLEAR TOÀN SCRIPT SAU 140 GIÂY
+task.spawn(function()
+    task.wait(AUTO_CLEAR)
+    running = false
+    print(("[Auto Spam M2] Đã hết %ds — script sẽ tự clear."):format(AUTO_CLEAR))
+    pcall(function()
+        script:Destroy()
+    end)
+end)
