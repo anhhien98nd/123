@@ -1,12 +1,13 @@
--- Auto Fast M1 (multi-schedule, tự động xoá sau khi hoàn tất)
--- Mỗi entry trong schedule = {start_seconds, end_seconds}
+-- Auto Fast M1 (multi-schedule, standalone)
+-- Mỗi entry trong schedule = {start_seconds, end_seconds} (tính từ lúc script bắt đầu)
+-- Ví dụ: {13, 54} => bật từ 13s đến 54s (chạy 41 giây)
 
 local FIRE_INTERVAL = 0.1 -- khoảng cách giữa mỗi lần gửi (giây)
 
--- lịch hoạt động
+-- lịch hoạt động (thời điểm bắt đầu và tắt)
 local schedule = {
-    {13, 55},   -- bật lúc 13s, tắt lúc 55s
-    {127, 133}, -- bật lúc 127s, tắt lúc 133s
+    {13, 55},  -- bật lúc 13s, tắt lúc 55s  
+    {127, 133},  -- bật lúc 127s, tắt lúc 133s  
 }
 
 -- tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback tìm descendants)
@@ -52,8 +53,6 @@ end
 
 -- scheduling
 local tick0 = tick()
-local totalSchedules = #schedule
-local completed = 0
 
 for i, win in ipairs(schedule) do
     local startSec, endSec = win[1], win[2]
@@ -83,20 +82,6 @@ for i, win in ipairs(schedule) do
             end
 
             print(("[Auto Fast M1] #%d OFF (%.1fs)"):format(i, endSec))
-            completed += 1
-
-            -- ✅ Khi tất cả schedule đều hoàn tất → xoá script
-            if completed >= totalSchedules then
-                print("[Auto Fast M1] ✅ Tất cả schedule đã hoàn tất. Tự động xoá script...")
-
-                -- dọn sạch bộ nhớ
-                task.delay(1, function()
-                    remote, bf, schedule, safeFire = nil, nil, nil, nil
-                    table.clear(getfenv()) -- xóa toàn bộ biến trong môi trường hiện tại
-                    collectgarbage("collect")
-                    print("[Auto Fast M1] 🧹 Script đã được tự xoá hoàn toàn khỏi bộ nhớ.")
-                end)
-            end
         end)
     end
-end
+end 
