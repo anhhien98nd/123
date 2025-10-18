@@ -1,16 +1,18 @@
--- Auto TP1 Lock: bật tại giây 10, tắt tại giây 134 (tổng)
+-- Auto TP1 Lock: bật tại giây 10, tắt tại giây 134 (tổng), sau 140s clear toàn bộ script
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
 local STATE = { tp1 = false }
+local running = true
 
 task.spawn(function()
 	-- Chờ 10s rồi bật
 	task.wait(10)
+	if not running then return end
 	print("[AUTO] Bật TP1 Lock tại giây 10")
 	STATE.tp1 = true
 
-	local pos = Vector3.new(40,3.63,-130.14)
+	local pos = Vector3.new(40, 3.63, -130.14)
 	local look
 	pcall(function()
 		look = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
@@ -19,7 +21,7 @@ task.spawn(function()
 
 	-- Giữ lock khi bật
 	task.spawn(function()
-		while STATE.tp1 do
+		while STATE.tp1 and running do
 			task.wait()
 			local c = p.Character
 			if c then
@@ -36,8 +38,18 @@ task.spawn(function()
 		end
 	end)
 
-	-- Tắt tại giây 134 tổng 
+	-- Tắt tại giây 134 tổng
 	task.wait(134)
+	if not running then return end
 	STATE.tp1 = false
 	print("[AUTO] Tắt TP1 Lock tại giây 134 (tổng)")
+end)
+
+-- Sau 140s: clear toàn bộ script
+task.spawn(function()
+	task.wait(140)
+	running = false
+	STATE.tp1 = false
+	print("[AUTO] Đã hết 140s, clear toàn bộ script")
+	script:Destroy()
 end)
