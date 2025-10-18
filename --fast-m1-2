@@ -6,7 +6,7 @@ local FIRE_INTERVAL = 0.1 -- khoảng cách giữa mỗi lần gửi (giây)
 
 -- lịch hoạt động (thời điểm bắt đầu và tắt)
 local schedule = {
-    {13, 55},  -- bật lúc 13s, tắt lúc 55s  
+    {13, 54},  -- bật lúc 13s, tắt lúc 54s  
     {127, 133},  -- bật lúc 127s, tắt lúc 133s  
 }
 
