@@ -10,7 +10,7 @@ task.spawn(function()
 	print("[AUTO] Bật TP1 Lock tại giây 10")
 	STATE.tp1 = true
 
-	local pos = Vector3.new(42.29, 3.63, -132.49)
+	local pos = Vector3.new(40,3.63,-130.14)
 	local look
 	pcall(function()
 		look = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
