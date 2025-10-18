@@ -2,15 +2,13 @@
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
-local STATE = { tp2 = false }
-local running = true
+local STATE = { tp1 = false }
 
 task.spawn(function()
 	-- Chờ 10s rồi bật
 	task.wait(10)
-	if not running then return end
 	print("[AUTO] Bật TP2 Lock tại giây 10")
-	STATE.tp2 = true
+	STATE.tp1 = true
 
 	local pos = Vector3.new(42.29, 3.63, -132.49)
 	local look
@@ -21,7 +19,7 @@ task.spawn(function()
 
 	-- Giữ lock khi bật
 	task.spawn(function()
-		while STATE.tp2 and running do
+		while STATE.tp1 do
 			task.wait()
 			local c = p.Character
 			if c then
@@ -40,16 +38,6 @@ task.spawn(function()
 
 	-- Tắt tại giây 134 tổng 
 	task.wait(134)
-	if not running then return end
-	STATE.tp2 = false
-	print("[AUTO] Tắt TP2 Lock tại giây 134 (tổng)")
-end)
-
--- Sau 140s: clear toàn bộ script
-task.spawn(function()
-	task.wait(140)
-	running = false
-	STATE.tp2 = false
-	print("[AUTO] Đã hết 140s, clear toàn bộ TP2 Lock script")
-	script:Destroy()
+	STATE.tp1 = false
+	print("[AUTO] Tắt TP1 Lock tại giây 134 (tổng)")
 end)
