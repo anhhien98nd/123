@@ -7,9 +7,9 @@ local FIRE_INTERVAL = 0.4 -- khoảng giữa mỗi lần gửi (giây)
 
 -- Schedule: mỗi entry = {start, end}
 local schedule = {
-    {61, 65},   -- bật lúc 61s, tắt lúc 65s
-    {84, 88},   -- bật lúc 84s, tắt lúc 88s
-    {106, 110}, -- bật lúc 106s, tắt lúc 110s
+    {61, 65},  -- bật lúc 61s, tắt lúc 65s
+    {84, 88},  -- bật lúc 84s, tắt lúc 88s
+    {106, 110},  -- bật lúc 106s, tắt lúc 110s
 }
 
 -- tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback: tìm descendants)
@@ -39,10 +39,8 @@ else
 end
 
 local payload_str = "\019\000\000\0000201000113686372022\000"
-local running = true
 
 local function safeFire()
-    if not running then return end
     if remote and bf then
         pcall(function()
             remote:FireServer({ { bf(payload_str) }, "\019" })
@@ -72,7 +70,7 @@ for i, win in ipairs(schedule) do
             if toWait > 0 then task.wait(toWait) end
 
             -- nếu đã qua endTime thì bỏ qua
-            if tick() >= endTime or not running then
+            if tick() >= endTime then
                 warn(("[Auto Spam M1] Schedule #%d đã trôi qua trước khi bắt đầu — bỏ qua"):format(i))
                 return
             end
@@ -80,7 +78,7 @@ for i, win in ipairs(schedule) do
             print(("[Auto Spam M1] Schedule #%d BẬT (%.1fs → %.1fs)"):format(i, startSec, endSec))
 
             -- spam trong khoảng thời gian hoạt động
-            while tick() < endTime and running do
+            while tick() < endTime do
                 safeFire()
                 task.wait(FIRE_INTERVAL)
             end
@@ -88,14 +86,4 @@ for i, win in ipairs(schedule) do
             print(("[Auto Spam M1] Schedule #%d TẮT (%.1fs)"):format(i, endSec))
         end)
     end
-end  
-
--- ♻️ TỰ ĐỘNG CLEAR SCRIPT SAU 140 GIÂY (độc lập hoàn toàn)
-task.spawn(function()
-    task.wait(140)
-    running = false
-    print("[Auto Spam M1] Đã hết 140s — script sẽ tự động clear.")
-    pcall(function()
-        script:Destroy()
-    end)
-end)
+end 
