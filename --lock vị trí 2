@@ -1,4 +1,4 @@
--- Auto TP1 Lock: bật tại giây 10, tắt tại giây 110 (tổng)
+-- Auto TP1 Lock: bật tại giây 10, tắt tại giây 134 (tổng)
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
@@ -36,7 +36,7 @@ task.spawn(function()
 		end
 	end)
 
-	-- Tắt tại giây 110 tổng (sau 100s kể từ lúc bật)
+	-- Tắt tại giây 134 tổng 
 	task.wait(134)
 	STATE.tp1 = false
 	print("[AUTO] Tắt TP1 Lock tại giây 134 (tổng)")
