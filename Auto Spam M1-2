@@ -1,4 +1,4 @@
--- Auto Spam M1 (multi schedule, standalone)
+-- Auto Spam M1 (multi schedule, standalone + auto self-destroy)
 -- Mỗi entry trong schedule: {start_time, end_time}
 -- => start_time: thời điểm bắt đầu (tính từ lúc script bắt đầu)
 -- => end_time: thời điểm kết thúc (giây)
@@ -7,9 +7,9 @@ local FIRE_INTERVAL = 0.4 -- khoảng giữa mỗi lần gửi (giây)
 
 -- Các lần Spam M1
 local schedule = {
-    {72, 76},  -- bật lúc 62s, tắt lúc 66s
-    {95, 99},  -- bật lúc 80s, tắt lúc 84s
-    {116, 120},  -- bật lúc 94s, tắt lúc 98s
+    {72, 76},   -- bật lúc 72s, tắt lúc 76s
+    {95, 99},   -- bật lúc 95s, tắt lúc 99s
+    {116, 120}, -- bật lúc 116s, tắt lúc 120s
 }
 
 -- Tìm remote: ReplicatedStorage → BridgeNet2 → dataRemoteEvent
@@ -55,6 +55,8 @@ end
 
 -- MAIN LOOP (xử lý từng schedule)
 local tick0 = tick()
+local total = #schedule
+local finished = 0
 
 for i, window in ipairs(schedule) do
     local start_time, end_time = window[1], window[2]
@@ -73,6 +75,21 @@ for i, window in ipairs(schedule) do
             end
 
             print(("[Auto Spam M1] #%d TẮT (%.1fs)"):format(i, end_time))
+            finished += 1
+
+            -- ✅ Khi tất cả schedule hoàn thành → tự xoá script
+            if finished >= total then
+                print("[Auto Spam M1] ✅ Toàn bộ schedule đã hoàn tất, đang tự dọn và xoá script...")
+
+                task.delay(1, function()
+                    -- Dọn sạch biến trong môi trường hiện tại
+                    remote, bf, schedule, safeFire = nil, nil, nil, nil
+                    table.clear(getfenv())
+                    collectgarbage("collect")
+
+                    print("[Auto Spam M1] 🧹 Script đã được tự xoá hoàn toàn khỏi bộ nhớ.")
+                end)
+            end
         end)
     else
         warn(("[Auto Spam M1] Schedule #%d không hợp lệ (start=%s, end=%s)"):format(i, tostring(start_time), tostring(end_time)))
