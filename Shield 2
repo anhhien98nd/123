@@ -3,12 +3,15 @@
 -- Khi có ít nhất 1 cửa sổ đang active => gửi shield = true. Khi không còn cửa sổ nào => gửi shield = false.
 
 local schedule = {
-    {59, 67},  -- bắt đầu 59s, kết thúc 67s
-    {83, 91},  -- bắt đầu 83s, kết thúc 91
-    {105, 113},  -- bắt đầu 105s, kết thúc 113s
+    {59, 67},   -- bắt đầu 59s, kết thúc 67s
+    {83, 91},   -- bắt đầu 83s, kết thúc 91s
+    {105, 113}, -- bắt đầu 105s, kết thúc 113s
 }
 
--- tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback: tìm descendants)
+local AUTO_CLEAR = 140 -- ⏱ thời gian tự động xóa script
+local running = true   -- cờ điều khiển global
+
+-- 🔍 tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback: tìm descendants)
 local remote
 pcall(function()
     local rs = game:GetService("ReplicatedStorage")
@@ -26,7 +29,9 @@ pcall(function()
     end
 end)
 
+-- 🛡️ Gửi tín hiệu Shield an toàn
 local function safeFireShield(state)
+    if not running then return end
     if remote then
         pcall(function()
             remote:FireServer({ state, "\024" })
@@ -39,7 +44,7 @@ local function safeFireShield(state)
     end
 end
 
--- quản lý trạng thái khi có nhiều cửa sổ (đếm số cửa sổ active)
+-- 📊 Quản lý trạng thái khi có nhiều cửa sổ (đếm số cửa sổ active)
 local activeCount = 0
 local tick0 = tick()
 
@@ -53,6 +58,7 @@ for i, win in ipairs(schedule) do
             local waitUntil = tick0 + startT
             local toWait = waitUntil - tick()
             if toWait > 0 then task.wait(toWait) end
+            if not running then return end
 
             -- nếu đã qua end time thì bỏ qua
             if tick() >= tick0 + endT then
@@ -60,7 +66,7 @@ for i, win in ipairs(schedule) do
                 return
             end
 
-            -- bắt đầu cửa sổ: tăng counter; nếu từ 0 -> 1 thì bật shield
+            -- bắt đầu cửa sổ
             activeCount = activeCount + 1
             if activeCount == 1 then
                 print(("[Auto Shield] Schedule #%d ON (%.1fs -> %.1fs) -> gửi SHIELD = true"):format(i, startT, endT))
@@ -69,9 +75,10 @@ for i, win in ipairs(schedule) do
                 print(("[Auto Shield] Schedule #%d ON (%.1fs -> %.1fs) -> activeCount=%d"):format(i, startT, endT, activeCount))
             end
 
-            -- chờ tới end time rồi giảm counter; nếu xuống 0 thì tắt shield
+            -- chờ tới end time
             local waitEnd = (tick0 + endT) - tick()
             if waitEnd > 0 then task.wait(waitEnd) end
+            if not running then return end
 
             activeCount = math.max(0, activeCount - 1)
             if activeCount == 0 then
@@ -82,4 +89,15 @@ for i, win in ipairs(schedule) do
             end
         end)
     end
-end 
+end  
+
+-- ♻️ TỰ ĐỘNG CLEAR TOÀN BỘ SAU 140 GIÂY
+task.spawn(function()
+    task.wait(AUTO_CLEAR)
+    running = false
+    print(("[Auto Shield] Đã hết %ds — script sẽ tự clear."):format(AUTO_CLEAR))
+    pcall(function()
+        safeFireShield(false)
+        script:Destroy()
+    end)
+end)
