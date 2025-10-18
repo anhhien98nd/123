@@ -1,17 +1,18 @@
--- Auto Spam M2 (multi-window + auto self-destroy)
+-- Auto Spam M2 (schedule nhiều cửa sổ)
 -- Dán vào executor — độc lập, không cần GUI hay code gốc
 
 local FIRE_INTERVAL = 0.65 -- khoảng giữa mỗi lần gửi (giây)
 
--- 🕒 Danh sách các cửa sổ thời gian (giây tính từ tick0)
+-- Danh sách cửa sổ: {start_seconds, end_seconds}
+-- Mỗi giá trị là thời điểm tính từ lúc script bắt đầu (tick0)
 local schedule = {
-    {13, 22},   -- bật lúc 13s, tắt lúc 22s
-    {32, 41},   -- bật lúc 32s, tắt lúc 41s
-    {51, 55},   -- bật lúc 51s, tắt lúc 55s
-    {127, 133}, -- bật lúc 127s, tắt lúc 133s
+    {13, 22},  -- bắt đầu 13s, kết thúc 22s
+    {32, 41},  -- bắt đầu 32s, kết thúc 41s
+    {51, 55},  -- bắt đầu 51s, kết thúc 55s
+    {127, 133},  -- bắt đầu 127s, kết thúc 133s
 }
 
--- 🔍 Tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent
+-- tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback: tìm descendants)
 local remote
 pcall(function()
     local rs = game:GetService("ReplicatedStorage")
@@ -29,7 +30,7 @@ pcall(function()
     end
 end)
 
--- 🔧 bf(): ưu tiên buffer.fromstring nếu có
+-- bf(): ưu tiên buffer.fromstring nếu có, fallback trả chuỗi
 local bf
 if type(buffer) == "table" and type(buffer.fromstring) == "function" then
     bf = buffer.fromstring
@@ -37,10 +38,8 @@ else
     bf = function(s) return s end
 end
 
--- 📦 Payload M2
 local payload_str = "\019\000\000\0000201100101186595482\000"
 
--- 📤 Gửi yêu cầu
 local function safeFire()
     if remote and bf then
         pcall(function()
@@ -54,50 +53,38 @@ local function safeFire()
     end
 end
 
--- 🧭 MAIN LOOP
+-- start scheduling
 local tick0 = tick()
-local finished = 0
-local totalSchedules = #schedule
 
 for i, win in ipairs(schedule) do
     local startT, endT = win[1], win[2]
     if type(startT) ~= "number" or type(endT) ~= "number" or endT <= startT then
-        warn(("[Auto Spam M2] Schedule #%d không hợp lệ (start=%s end=%s) — bỏ qua"):format(i, tostring(startT), tostring(endT)))
+        warn(("[Auto Spam M2] Schedule #%d không hợp lệ (start=%s end=%s) - bỏ qua"):format(i, tostring(startT), tostring(endT)))
     else
         task.spawn(function()
-            -- ⏳ Chờ tới thời điểm bắt đầu
+            -- chờ đến thời điểm bắt đầu (tính từ tick0)
+            local now = tick()
             local waitUntil = tick0 + startT
-            local toWait = waitUntil - tick()
-            if toWait > 0 then task.wait(toWait) end
+            local toWait = waitUntil - now
+            if toWait > 0 then
+                task.wait(toWait)
+            end
 
+            -- nếu đã vượt quá end time, bỏ qua
             if tick() >= tick0 + endT then
                 warn(("[Auto Spam M2] Schedule #%d đã trôi qua trước khi bắt đầu — bỏ qua."):format(i))
-                finished += 1
                 return
             end
 
-            print(("[Auto Spam M2] Schedule #%d 🟢 BẬT (%.1fs → %.1fs)"):format(i, startT, endT))
+            print(("[Auto Spam M2] Schedule #%d ON (%.1fs -> %.1fs)"):format(i, startT, endT))
 
-            -- 🔁 Gửi liên tục trong khoảng thời gian
+            -- spam trong cửa sổ thời gian
             while tick() < tick0 + endT do
                 safeFire()
                 task.wait(FIRE_INTERVAL)
             end
 
-            print(("[Auto Spam M2] Schedule #%d 🔴 TẮT (%.1fs)"):format(i, endT))
-
-            -- 🧹 Kiểm tra nếu tất cả đã hoàn thành
-            finished += 1
-            if finished >= totalSchedules then
-                print("[Auto Spam M2] ✅ Tất cả schedule đã hoàn thành. Đang tự dọn và xoá script...")
-
-                task.delay(1, function()
-                    remote, bf, safeFire, schedule = nil, nil, nil, nil
-                    table.clear(getfenv())
-                    collectgarbage("collect")
-                    print("[Auto Spam M2] 🧹 Script đã được tự xoá hoàn toàn khỏi bộ nhớ.")
-                end)
-            end
+            print(("[Auto Spam M2] Schedule #%d OFF (kết thúc %.1fs)"):format(i, endT))
         end)
     end
-end
+end 
