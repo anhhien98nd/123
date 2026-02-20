@@ -64,13 +64,13 @@ end
 task.spawn(function()
 	local pos = Vector3.new(42.29, 3.63, -132.49)
 
-	-- 🟢 Giai đoạn 1: 10s → 77s
-	task.wait(10)
+	-- 🟢 Giai đoạn 1:
+	task.wait(9)
 	startLock(pos)
-	print("[AUTO] 🟢 Giai đoạn 1 bắt đầu (10s → 77s)")
-	task.wait(67) -- 10 → 77
+	print("[AUTO] 🟢 Giai đoạn 1")
+	task.wait(67)
 	stopLock()
-	print("[AUTO] ✅ Kết thúc giai đoạn 1 tại 77s")
+	print("[AUTO] ✅ Kết thúc giai đoạn 1")
 
 	-- 🟡 Giai đoạn 2: 87s → 153s
 	task.wait(10) -- 77 → 87
