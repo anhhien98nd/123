@@ -43,7 +43,7 @@ local payload_str = "\019\000\000\0000201000113686372022\000"
 local function safeFire()
     if remote and bf then
         pcall(function()
-            remote:FireServer({ { bf(payload_str) }, "\019" })
+            remote:FireServer({ { bf(payload_str) }, "\023" })
         end)
     else
         if not safeFire._warned then
