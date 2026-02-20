@@ -1,11 +1,11 @@
 -- Auto Spam M1 (multi schedule, standalone)
 
-local FIRE_INTERVAL = 0.4
+local FIRE_INTERVAL = 0.9
 
 local schedule = {
-    {72, 76},
-    {95, 99},
-    {116, 120},
+    {18, 23},
+    {32, 37},
+    {46, 51},
 }
 
 -- Tìm remote
@@ -30,7 +30,7 @@ local function safeFire()
     if remote and buffer and buffer.fromstring then
         pcall(function()
             remote:FireServer(
-                { { buffer.fromstring("\019\000\000\0000201000111271509104\000") }, "\019" },
+                { { buffer.fromstring("\019\000\000\0000201000111271509104\000") }, "\023" },
                 game:GetService("Players"):WaitForChild("opbrnpen").Character
             )
         end)
