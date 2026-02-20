@@ -1,4 +1,4 @@
--- 🌸 Auto TP1 Lock 3 Giai Đoạn (Bản thời gian mới)
+-- 🌸 Auto TP1 Lock 3 Giai Đoạn (Mốc thời gian tuyệt đối)
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 local STATE = { tp1 = false }
@@ -60,31 +60,35 @@ local function stopLock()
 	end
 end
 
--- 🕒 Chuỗi 3 giai đoạn thời gian
+-- 🕒 Chuỗi theo mốc thời gian tuyệt đối
 task.spawn(function()
 	local pos = Vector3.new(40, 3.63, -130.14)
 
-	-- 🟢 Giai đoạn 1:
-	task.wait(9)
-	startLock(pos)
-	print("[AUTO] 🟢 Giai đoạn 1 bắt đầu")
-	task.wait(52) 
-	stopLock()
-	print("[AUTO] ✅ Kết thúc giai đoạn 1")
+	local timeline = {
+		{9,  "start"},
+		{53, "stop"},
+		{62, "start"},
+		{106,"stop"},
+		{115,"start"},
+		{159,"stop"},
+	}
 
-	-- 🟡 Giai đoạn 2: 87s → 153s
-	task.wait(9) -- 77 → 87
-	startLock(pos)
-	print("[AUTO] 🟡 Bật lại TP1 Lock (87s → 152s)")
-	task.wait(52) -- 87 → 152
-	stopLock()
-	print("[AUTO] ✅ Tắt TP1 Lock lần 2 tại giây 152")
+	print("[AUTO] ⏳ Bắt đầu chuỗi TP1 Lock...")
 
-	-- 🔵 Giai đoạn 3: 162s → 229s
-	task.wait(9) -- 152 → 162
-	startLock(pos)
-	print("[AUTO] 🔵 Bật lại TP1 Lock (162s → 229s)")
-	task.wait(52) -- 162 → 229
-	stopLock()
-	print("[AUTO] ✅ Tắt TP1 Lock lần 3 tại giây 229")
+	local last = 0
+	for _, step in ipairs(timeline) do
+		local t, action = step[1], step[2]
+		task.wait(t - last)
+		last = t
+
+		if action == "start" then
+			startLock(pos)
+			print("[AUTO] ▶ TP1 Lock tại " .. t .. "s")
+		else
+			stopLock()
+			print("[AUTO] ⏹ Stop TP1 Lock tại " .. t .. "s")
+		end
+	end
+
+	print("[AUTO] ✅ Hoàn tất 3 giai đoạn TP1 Lock.")
 end)
