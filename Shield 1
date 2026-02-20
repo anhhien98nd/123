@@ -30,7 +30,7 @@ end)
 local function safeFireShield(state)
     if remote then
         pcall(function()
-            remote:FireServer({ state, "\024" })
+            remote:FireServer({ state, "\028" })
         end)
     else
         if not safeFireShield._warned then
