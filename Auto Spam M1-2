@@ -1,11 +1,11 @@
 -- Auto Spam M1 (multi schedule, standalone)
 
-local FIRE_INTERVAL = 0.4
+local FIRE_INTERVAL = 0.9
 
 local schedule = {
-    {1, 4},
-    {95, 99},
-    {116, 120},
+    {11, 16},
+    {25, 30},
+    {39, 44},
 }
 
 -- Tìm remote
