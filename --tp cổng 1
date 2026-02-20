@@ -38,11 +38,11 @@ task.spawn(function()
 
 	-- 🔹 Lần 1: sau 3 giây
 	task.wait(3)
-	print("[AUTO] 🚀 Dịch chuyển tới Cổng 1 (Lần 1 - sau 3s)")
+	print("[AUTO] 🚀 Dịch chuyển tới Cổng 1")
 	teleportToGate()
 
 	-- 🔹 Lần 2: sau thêm 60 giây (tổng 63s)
-	task.wait(60)
+	task.wait(54)
 	print("[AUTO] 🚀 Dịch chuyển lại tới Cổng 1 (Lần 2 - sau 63s)")
 	teleportToGate()
 
