@@ -42,12 +42,12 @@ task.spawn(function()
 	teleportToGate()
 
 	-- 🔹 Lần 2: sau thêm 60 giây (tổng 63s)
-	task.wait(60)
+	task.wait(54)
 	print("[AUTO] 🚀 Dịch chuyển lại tới Cổng 2 (Lần 2 - sau 63s)")
 	teleportToGate()
 
 	-- 🔹 Lần 3: sau thêm 50 giây (tổng 113s)
-	task.wait(50)
+	task.wait(54)
 	print("[AUTO] 🚀 Dịch chuyển lần 3 tới Cổng 2 (sau 113s)")
 	teleportToGate()
 
