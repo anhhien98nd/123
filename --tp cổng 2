@@ -1,4 +1,4 @@
--- 🌀 Auto Teleport Cổng 2 (3 lần: sau 3s, 63s, 113s)
+-- 🌀 Auto Teleport Cổng 2
 local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
