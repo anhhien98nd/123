@@ -62,7 +62,7 @@ end
 
 -- 🕒 Chuỗi theo mốc thời gian tuyệt đối
 task.spawn(function()
-	local pos = Vector3.new(0.850, -0.403, -130.513)
+	local pos = Vector3.new(-24.909, 3.627, -131.655)
 
 	local timeline = {
 		{9,  "start"},
