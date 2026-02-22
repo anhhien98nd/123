@@ -3,7 +3,7 @@ local Players = game:GetService("Players")
 local p = Players.LocalPlayer
 
 -- ⚙️ Toạ độ Cổng 1
-local teleportPos = Vector3.new(0.850, -0.403, -130.513)
+local teleportPos = Vector3.new(-7.625, 0.334, -115.758)
 
 -- 🧩 Hàm chờ HumanoidRootPart sẵn sàng
 local function waitForHRP()
