@@ -10,7 +10,7 @@ if p.Name ~= "d2wedsx" then
 end
 
 -- ⚙️ Toạ độ Cổng 1
-local teleportPos = Vector3.new(18.86713409423828, 0.37274569272994995, -114.86202239990234)
+local teleportPos = Vector3.new(-7.559, 0.334, -142.460)
 
 -- 🧩 Hàm chờ HumanoidRootPart sẵn sàng
 local function waitForHRP()
