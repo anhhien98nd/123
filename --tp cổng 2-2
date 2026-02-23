@@ -1,0 +1,60 @@
+-- 🌀 Auto Teleport Cổng 1
+
+local Players = game:GetService("Players")
+local p = Players.LocalPlayer or Players.PlayerAdded:Wait()
+
+-- 🔒 Giới hạn tài khoản
+if p.Name ~= "3ewrrads" then
+	warn("[AUTO] 🚫 Acc không được phép chạy Auto Teleport Cổng 1.")
+	return
+end
+
+-- ⚙️ Toạ độ Cổng 1
+local teleportPos = Vector3.new(-7.629, 0.334, -116.810)
+
+-- 🧩 Hàm chờ HumanoidRootPart sẵn sàng
+local function waitForHRP()
+	local chr = p.Character or p.CharacterAdded:Wait()
+	local hrp = chr:FindFirstChild("HumanoidRootPart")
+	local waited = 0
+	
+	while not hrp and waited < 5 do
+		task.wait(0.2)
+		waited += 0.2
+		chr = p.Character or p.CharacterAdded:Wait()
+		hrp = chr:FindFirstChild("HumanoidRootPart")
+	end
+	
+	return hrp
+end
+
+-- 🚀 Hàm dịch chuyển đến Cổng 1
+local function teleportToGate()
+	local hrp = waitForHRP()
+	if hrp then
+		pcall(function()
+			hrp.CFrame = CFrame.new(teleportPos + Vector3.new(0, 5, 0))
+		end)
+		print("[AUTO] ✨ Đã dịch chuyển tới Cổng 1 tại:", os.date("%X"))
+	else
+		warn("[AUTO] ⚠️ Không tìm thấy HumanoidRootPart — không thể dịch chuyển.")
+	end
+end
+
+-- 🧠 Chuỗi theo mốc thời gian tuyệt đối
+local marks = {3, 69, 135}
+
+task.spawn(function()
+	print("[AUTO] ⏳ Bắt đầu chuỗi Auto Teleport Cổng 1...")
+
+	local last = 0
+	for i, t in ipairs(marks) do
+		task.wait(t - last)
+		last = t
+		
+		print("[AUTO] 🚀 Dịch chuyển tới Cổng 1 (Lần " .. i .. " - tại " .. t .. "s)")
+		teleportToGate()
+	end
+
+	print("[AUTO] ✅ Hoàn tất chuỗi dịch chuyển.")
+end)
