@@ -69,7 +69,7 @@ end
 
 -- 🕒 Timeline tuyệt đối
 task.spawn(function()
-	local pos = Vector3.new(42.29, 3.63, -132.49)
+	local pos = Vector3.new(-24.866, 3.627, -137.086)
 
 	local timeline = {
 		{9,   "start"},
