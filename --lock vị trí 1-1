@@ -1,7 +1,14 @@
 -- 🌸 Auto TP1 Lock 3 Giai Đoạn (Mốc thời gian tuyệt đối)
+
 local Players = game:GetService("Players")
-local p = Players.LocalPlayer
+local p = Players.LocalPlayer or Players.PlayerAdded:Wait()
 local STATE = { tp1 = false }
+
+-- 🔒 Giới hạn tài khoản
+if p.Name ~= "d2wedsx" then
+	warn("[AUTO] 🚫 Acc không được phép chạy TP1 Lock.")
+	return
+end
 
 -- ⏳ Chờ character và HumanoidRootPart sẵn sàng
 local function waitForHRP()
@@ -62,15 +69,15 @@ end
 
 -- 🕒 Chuỗi theo mốc thời gian tuyệt đối
 task.spawn(function()
-	local pos = Vector3.new(-24.866, 3.627, -134.454)
+	local pos = Vector3.new(40, 3.63, -130.14)
 
 	local timeline = {
-		{9,  "start"},
-		{63, "stop"},
-		{75, "start"},
-		{129,"stop"},
-		{141,"start"},
-		{200,"stop"},
+		{9,   "start"},
+		{63,  "stop"},
+		{75,  "start"},
+		{129, "stop"},
+		{141, "start"},
+		{200, "stop"},
 	}
 
 	print("[AUTO] ⏳ Bắt đầu chuỗi TP1 Lock...")
