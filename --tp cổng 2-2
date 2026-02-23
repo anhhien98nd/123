@@ -35,7 +35,7 @@ local function teleportToGate()
 end
 
 -- 🧠 Chuỗi tự động theo mốc thời gian tuyệt đối
-local marks = {3, 69, 133}
+local marks = {3, 69, 135}
 
 task.spawn(function()
 	print("[AUTO] ⏳ Bắt đầu chuỗi Auto Teleport Cổng 2...")
