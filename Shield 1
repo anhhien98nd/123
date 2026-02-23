@@ -1,8 +1,15 @@
--- Auto Shield (multi schedule, standalone)
--- Mỗi entry trong schedule = {start_time, end_time}
--- start_time: thời điểm bắt đầu (giây kể từ khi script chạy)
--- end_time: thời điểm kết thúc (giây kể từ khi script chạy)
+-- Auto Shield (single-account lock)
 
+local Players = game:GetService("Players")
+local p = Players.LocalPlayer or Players.PlayerAdded:Wait()
+
+-- 🔒 Giới hạn tài khoản
+if p.Name ~= "ulucasko" then
+    warn("[Auto Shield] 🚫 Acc không được phép chạy script này.")
+    return
+end
+
+-- Mỗi entry trong schedule = {start_time, end_time}
 local schedule = {
     {11, 17},
     {29, 35},
@@ -46,21 +53,19 @@ local function safeFireShield(state)
     end
 end
 
--- MAIN LOOP (xử lý nhiều khoảng thời gian)
+-- MAIN LOOP
 local tick0 = tick()
 
 for i, window in ipairs(schedule) do
     local start_time, end_time = window[1], window[2]
     if type(start_time) == "number" and type(end_time) == "number" and end_time > start_time then
         task.spawn(function()
-            -- chờ đến lúc bật
             local wait_time = tick0 + start_time - tick()
             if wait_time > 0 then task.wait(wait_time) end
 
             print(("[Auto Shield] #%d BẬT (%.1fs → %.1fs)"):format(i, start_time, end_time))
             safeFireShield(true)
 
-            -- chờ tới lúc tắt
             local remain = tick0 + end_time - tick()
             if remain > 0 then task.wait(remain) end
 
@@ -68,6 +73,7 @@ for i, window in ipairs(schedule) do
             print(("[Auto Shield] #%d TẮT (%.1fs)"):format(i, end_time))
         end)
     else
-        warn(("[Auto Shield] Schedule #%d không hợp lệ (start=%s, end=%s)"):format(i, tostring(start_time), tostring(end_time)))
+        warn(("[Auto Shield] Schedule #%d không hợp lệ (start=%s, end=%s)")
+            :format(i, tostring(start_time), tostring(end_time)))
     end
-end 
+end
