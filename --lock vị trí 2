@@ -77,7 +77,7 @@ task.spawn(function()
 		{79,  "start"},
 		{133, "stop"},
 		{149, "start"},
-		{300, "stop"},
+		{204, "stop"},
 	}
 
 	print("[AUTO] ⏳ Bắt đầu chuỗi TP2 Lock...")
