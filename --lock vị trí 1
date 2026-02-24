@@ -73,11 +73,11 @@ task.spawn(function()
 
 	local timeline = {
 		{9,   "start"},
-		{63,  "stop"},
-		{79,  "start"},
-		{133, "stop"},
-		{149, "start"},
-		{204, "stop"},
+		{67,  "stop"},
+		{83,  "start"},
+		{139, "stop"},
+		{155, "start"},
+		{216, "stop"},
 	}
 
 	print("[AUTO] ⏳ Bắt đầu chuỗi TP1 Lock...")
