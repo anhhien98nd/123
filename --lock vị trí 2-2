@@ -5,7 +5,7 @@ local p = Players.LocalPlayer or Players.PlayerAdded:Wait()
 local STATE = { tp2 = false }
 
 -- 🔒 Giới hạn tài khoản
-if p.Name ~= "d2wedsx" then
+if p.Name ~= "3ewrrads" then
 	warn("[AUTO] 🚫 Acc không được phép chạy TP2 Lock.")
 	return
 end
