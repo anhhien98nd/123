@@ -11,15 +11,15 @@ end
 
 -- Mỗi entry trong `schedule` là {start_seconds, end_seconds}
 local schedule = {
-    {15, 20},
-    {33, 38},
-    {51, 56},
-    {87, 92},
-    {105, 110},
-    {123, 128},
-    {161, 166},
-    {179, 184},
-    {197, 202},
+    {24, 30},
+    {42, 48},
+    {60, 66},
+    {96, 102},
+    {114, 120},
+    {132, 138},
+    {170, 176},
+    {188, 194},
+    {206, 212},
 }
 
 -- tìm remote: ReplicatedStorage -> BridgeNet2 -> dataRemoteEvent (fallback)
