@@ -4,7 +4,7 @@ local Players = game:GetService("Players")
 local p = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
 -- 🔒 Giới hạn tài khoản
-if p.Name ~= "pphiphieyqu" then
+if p.Name ~= "moi8tinh2" then
     warn("[Auto Shield] 🚫 Acc không được phép chạy script này.")
     return
 end
