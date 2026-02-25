@@ -46,7 +46,7 @@ local function safeFire()
         pcall(function()
             remote:FireServer(
                 { { buffer.fromstring("\019\000\000\0000201000111271509104\000") }, "\023" },
-                Players:WaitForChild("3ewrrads").Character
+                Players:WaitForChild("a978ujjoijn").Character
             )
         end)
     else
