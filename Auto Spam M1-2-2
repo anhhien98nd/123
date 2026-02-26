@@ -4,7 +4,7 @@ local Players = game:GetService("Players")
 local p = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
 -- 🔒 Giới hạn tài khoản
-if p.Name ~= "a978ujjoijn" then
+if p.Name ~= "moi8tinh2" then
     warn("[Auto Spam M1] 🚫 Acc không được phép chạy script này.")
     return
 end
@@ -46,7 +46,7 @@ local function safeFire()
         pcall(function()
             remote:FireServer(
                 { { buffer.fromstring("\019\000\000\0000201000111271509104\000") }, "\023" },
-                Players:WaitForChild("aximkaoik").Character
+                Players:WaitForChild("lalapoplx").Character
             )
         end)
     else
